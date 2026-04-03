@@ -21,7 +21,7 @@ export default function ProductsSection() {
 
   const fetchProducts = async () => {
     try {
-      const res = await fetch("http://localhost:1337/api/products/all");
+      const res = await fetch("http://localhost:1337/api/products");
       const data = await res.json();
       const productsArray = Array.isArray(data) ? data : data.data || [];
       setProducts(productsArray);

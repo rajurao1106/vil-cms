@@ -4,29 +4,40 @@ import React, { useState, useEffect } from "react";
 export default function BoardSection() {
   const [members, setMembers] = useState([]);
   const [showForm, setShowForm] = useState(false);
-  const [formData, setFormData] = useState({});
+  const [formData, setFormData] = useState({
+    fullName: "",
+    designation: "",
+    profileImageUrl: "",
+  });
 
   useEffect(() => {
     fetchMembers();
   }, []);
 
   const fetchMembers = async () => {
-    const res = await fetch("http://localhost:1337/api/board");
-    const data = await res.json();
-    setMembers(data);
+    try {
+      const res = await fetch("http://localhost:1337/api/board-members");
+      const data = await res.json();
+      setMembers(data);
+    } catch (error) {
+      console.error("Error fetching members:", error);
+    }
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    const fd = new FormData();
-    Object.keys(formData).forEach((key) => fd.append(key, formData[key]));
 
-    await fetch("http://localhost:1337/api/board/add", {
+    // Changed from FormData to JSON
+    await fetch("http://localhost:1337/api/board-members/add", {
       method: "POST",
-      body: fd,
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(formData),
     });
+
     setShowForm(false);
-    setFormData({});
+    setFormData({ fullName: "", designation: "", profileImageUrl: "" });
     fetchMembers();
   };
 
@@ -66,7 +77,7 @@ export default function BoardSection() {
                 <td className="py-4 px-6">
                   <img
                     src={member.profileImageUrl}
-                    alt=""
+                    alt={member.fullName}
                     className="w-12 h-12 rounded-2xl object-cover"
                   />
                 </td>
@@ -84,7 +95,6 @@ export default function BoardSection() {
         </table>
       </div>
 
-      {/* Add Member Modal - Simplified (You can expand it) */}
       {showForm && (
         <div className="fixed inset-0 bg-black/60 flex items-center justify-center z-50">
           <div className="bg-white rounded-3xl p-8 w-full max-w-md">
@@ -93,6 +103,7 @@ export default function BoardSection() {
               <input
                 type="text"
                 placeholder="Full Name"
+                value={formData.fullName}
                 onChange={(e) =>
                   setFormData({ ...formData, fullName: e.target.value })
                 }
@@ -102,21 +113,23 @@ export default function BoardSection() {
               <input
                 type="text"
                 placeholder="Designation"
+                value={formData.designation}
                 onChange={(e) =>
                   setFormData({ ...formData, designation: e.target.value })
                 }
                 className="w-full border rounded-2xl px-4 py-3"
                 required
               />
+              {/* Changed from type="file" to type="text" */}
               <input
-                type="file"
+                type="text"
+                placeholder="Profile Image URL"
+                value={formData.profileImageUrl}
                 onChange={(e) =>
-                  setFormData({
-                    ...formData,
-                    profileImageUrl: e.target.files[0],
-                  })
+                  setFormData({ ...formData, profileImageUrl: e.target.value })
                 }
                 className="w-full border rounded-2xl px-4 py-3"
+                required
               />
               <div className="flex gap-4 mt-6">
                 <button

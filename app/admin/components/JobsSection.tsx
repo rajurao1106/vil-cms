@@ -43,7 +43,7 @@ export default function JobsSection() {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      const res = await fetch("http://localhost:1337/api/jobs/add", {
+      const res = await fetch("http://localhost:1337/api/jobs", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(formData),

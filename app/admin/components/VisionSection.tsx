@@ -1,14 +1,14 @@
-"use client";
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect } from 'react';
 
-export default function VisionSection() {
-  const [data, setData] = useState({
-    sectionTitle: "",
-    visionStatement: "",
-    missionStatement: "",
+const VisionMissionAdmin = () => {
+  const [formData, setFormData] = useState({
+    sectionTitle: '',
+    visionStatement: '',
+    missionStatement: '',
+    backgroundImage: ''
   });
-  const [loading, setLoading] = useState(true);
-  const [isSaving, setIsSaving] = useState(false); // Button state handle karne ke liye
+
+  const API_URL = 'http://localhost:1337/api/vision-mission';
 
   useEffect(() => {
     fetchData();
@@ -16,136 +16,93 @@ export default function VisionSection() {
 
   const fetchData = async () => {
     try {
-      const res = await fetch("http://localhost:1337/api/vision-mission");
-      const json = await res.json();
-      if (json) setData(json);
-    } catch (error) {
-      console.error("Fetch Error:", error);
-    } finally {
-      setLoading(false);
+      const response = await fetch(API_URL);
+      if (response.ok) {
+        const data = await response.json();
+        // Adjusting based on common API structures (e.g., Strapi often uses data.attributes)
+        setFormData(data.attributes || data);
+      }
+    } catch (err) {
+      console.error("Error fetching data:", err);
     }
   };
 
-  const handleChange = (e) => {
-    const { name, value } = e.target;
-    setData((prev) => ({ ...prev, [name]: value }));
-  };
-
-  const handleSave = async (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    setIsSaving(true); // Button ko disable karne ke liye
-
-    const fd = new FormData();
-    fd.append("sectionTitle", data.sectionTitle);
-    fd.append("visionStatement", data.visionStatement);
-    fd.append("missionStatement", data.missionStatement);
-    
-    // Check agar user ne nayi file select ki hai
-    const fileInput = e.target.backgroundImage.files[0];
-    if (fileInput) {
-      fd.append("backgroundImage", fileInput);
-    }
-
     try {
-      console.log("Sending data..."); // Debugging line
-      const res = await fetch("http://localhost:1337/api/vision-mission/save", {
-        method: "POST",
-        // NOTE: FormData ke saath 'Content-Type' header MANUALLY MAT LAGANA
-        body: fd,
+      const response = await fetch(`${API_URL}/save`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(formData),
       });
 
-      if (res.ok) {
-        alert("Vision & Mission Saved Successfully!");
-        fetchData();
+      if (response.ok) {
+        alert('Updated successfully!');
       } else {
-        const errorData = await res.text();
-        console.error("Server Error:", errorData);
-        alert("Server returned an error. Check console.");
+        throw new Error('Failed to update');
       }
-    } catch (error) {
-      console.error("Network Error:", error);
-      alert("Could not connect to server.");
-    } finally {
-      setIsSaving(false);
+    } catch (err) {
+      console.error(err);
+      alert('Error updating data');
     }
   };
 
-  if (loading) return <p className="p-8 text-center">Loading Data...</p>;
-
   return (
-    <div className="max-w-3xl mx-auto p-4">
-      <h2 className="text-3xl font-bold mb-8">Vision & Mission Settings</h2>
-      <form
-        onSubmit={handleSave}
-        className="bg-white rounded-3xl p-8 shadow-lg space-y-6"
-        key={data._id || "form-key"}
-      >
+    <div className="max-w-2xl mx-auto p-6 bg-white shadow-md rounded-lg mt-10">
+      <h2 className="text-2xl font-bold mb-4 border-b pb-2">Edit Vision & Mission</h2>
+      <form onSubmit={handleSubmit} className="space-y-4">
+        
         <div>
-          <label className="block text-sm font-semibold mb-2">Section Title</label>
-          <input
-            name="sectionTitle"
-            value={data.sectionTitle || ""}
-            onChange={handleChange}
-            placeholder="Enter Title"
-            className="w-full border rounded-2xl px-4 py-3 focus:ring-2 focus:ring-teal-500 outline-none"
+          <label className="block font-medium text-gray-700">Section Title</label>
+          <input 
+            className="w-full border p-2 rounded focus:ring-2 focus:ring-blue-500 outline-none"
+            value={formData.sectionTitle}
+            onChange={(e) => setFormData({...formData, sectionTitle: e.target.value})}
             required
           />
         </div>
 
         <div>
-          <label className="block text-sm font-semibold mb-2">Vision Statement</label>
-          <textarea
-            name="visionStatement"
-            value={data.visionStatement || ""}
-            onChange={handleChange}
-            placeholder="Enter Vision"
-            rows={4}
-            className="w-full border rounded-3xl p-4 focus:ring-2 focus:ring-teal-500 outline-none"
+          <label className="block font-medium text-gray-700">Vision Statement</label>
+          <textarea 
+            className="w-full border p-2 rounded h-24 focus:ring-2 focus:ring-blue-500 outline-none"
+            value={formData.visionStatement}
+            onChange={(e) => setFormData({...formData, visionStatement: e.target.value})}
+            required
           />
         </div>
 
         <div>
-          <label className="block text-sm font-semibold mb-2">Mission Statement</label>
-          <textarea
-            name="missionStatement"
-            value={data.missionStatement || ""}
-            onChange={handleChange}
-            placeholder="Enter Mission"
-            rows={4}
-            className="w-full border rounded-3xl p-4 focus:ring-2 focus:ring-teal-500 outline-none"
+          <label className="block font-medium text-gray-700">Mission Statement</label>
+          <textarea 
+            className="w-full border p-2 rounded h-24 focus:ring-2 focus:ring-blue-500 outline-none"
+            value={formData.missionStatement}
+            onChange={(e) => setFormData({...formData, missionStatement: e.target.value})}
+            required
           />
         </div>
 
         <div>
-          <label className="block text-sm font-semibold mb-2">Background Image</label>
-          {data.backgroundImage && (
-            <div className="mb-4">
-              <p className="text-xs text-gray-500 mb-1">Current Image:</p>
-              <img 
-                src={data.backgroundImage} 
-                alt="Current" 
-                className="h-24 w-auto rounded-lg border shadow-sm" 
-              />
-            </div>
-          )}
-          <input
-            type="file"
-            name="backgroundImage"
-            className="w-full border border-dashed rounded-2xl px-4 py-3 bg-gray-50"
-            accept="image/*"
+          <label className="block font-medium text-gray-700">Background Image URL</label>
+          <input 
+            className="w-full border p-2 rounded focus:ring-2 focus:ring-blue-500 outline-none"
+            value={formData.backgroundImage}
+            onChange={(e) => setFormData({...formData, backgroundImage: e.target.value})}
+            required
           />
         </div>
 
-        <button
-          type="submit"
-          disabled={isSaving}
-          className={`w-full py-4 rounded-3xl font-bold text-white transition-all ${
-            isSaving ? "bg-gray-400 cursor-not-allowed" : "bg-teal-600 hover:bg-teal-700 shadow-md"
-          }`}
+        <button 
+          type="submit" 
+          className="w-full bg-blue-600 text-white font-semibold py-2 rounded hover:bg-blue-700 transition duration-200"
         >
-          {isSaving ? "Saving..." : "Save Changes"}
+          Save Changes
         </button>
       </form>
     </div>
   );
-}
+};
+
+export default VisionMissionAdmin;

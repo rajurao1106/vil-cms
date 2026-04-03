@@ -46,7 +46,7 @@ export default function PostsSection() {
     };
 
     try {
-      const res = await fetch("http://localhost:1337/api/posts/add", {
+      const res = await fetch("http://localhost:1337/api/posts", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(finalData),

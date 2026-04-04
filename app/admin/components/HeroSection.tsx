@@ -1,11 +1,29 @@
 "use client";
 import React, { useState, useEffect } from "react";
 
+interface Slider {
+  _id: string;
+  heading?: string;
+  subtitle?: string;
+  ctaText?: string;
+  ctaLink?: string;
+  backgroundImagePath?: string;
+}
+
+interface SliderFormData {
+  heading?: string;
+  subtitle?: string;
+  ctaText?: string;
+  ctaLink?: string;
+  backgroundImagePath?: File;
+  [key: string]: string | File | undefined;
+}
+
 export default function HeroSection() {
-  const [sliders, setSliders] = useState([]);
+  const [sliders, setSliders] = useState<Slider[]>([]);
   const [showForm, setShowForm] = useState(false);
-  const [editing, setEditing] = useState(null);
-  const [formData, setFormData] = useState({});
+  const [editing, setEditing] = useState<Slider | null>(null);
+  const [formData, setFormData] = useState<SliderFormData>({});
 
   const API = "http://localhost:1337/api/hero-sliders";
 
@@ -13,17 +31,17 @@ export default function HeroSection() {
     fetchSliders();
   }, []);
 
-const fetchSliders = async () => {
-  try {
-    const res = await fetch(`${API}/all`);
-    if (!res.ok) throw new Error("Network response was not ok");
-    const data = await res.json();
-    setSliders(Array.isArray(data) ? data : data.data || []);
-  } catch (error) {
-    console.error("Fetch error:", error);
-    setSliders([]); // Set empty array so .map() doesn't crash
-  }
-};
+  const fetchSliders = async () => {
+    try {
+      const res = await fetch(`${API}/all`);
+      if (!res.ok) throw new Error("Network response was not ok");
+      const data = await res.json();
+      setSliders(Array.isArray(data) ? data : data.data || []);
+    } catch (error) {
+      console.error("Fetch error:", error);
+      setSliders([]); // Set empty array so .map() doesn't crash
+    }
+  };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -42,7 +60,7 @@ const fetchSliders = async () => {
     fetchSliders();
   };
 
-  const deleteSlider = async (id) => {
+  const deleteSlider = async (id: string) => {
     if (!confirm("Delete this slider?")) return;
     await fetch(`${API}/${id}`, { method: "DELETE" });
     fetchSliders();

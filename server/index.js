@@ -98,7 +98,7 @@ app.get("/test", (req, res) => {
 });
 
 // ✅ Start Server (with DB connection)
-const PORT = process.env.PORT || 1337;
+const PORT = process.env.PORT || 1337; 
 
 async function startServer() {
   try {

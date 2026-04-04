@@ -1,6 +1,8 @@
 import mongoose from 'mongoose';
 import dotenv from "dotenv";
 
+dotenv.config()
+
 const connectDB = async () => {
     try {
         // MONGO_URI check karne ke liye log add kiya hai

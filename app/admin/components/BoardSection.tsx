@@ -43,7 +43,7 @@ export default function BoardSection() {
 
   const deleteMember = async (id) => {
     if (!confirm("Delete member?")) return;
-    await fetch(`http://localhost:1337/api/board/${id}`, { method: "DELETE" });
+    await fetch(`http://localhost:1337/api/board-members/${id}`, { method: "DELETE" });
     fetchMembers();
   };
 

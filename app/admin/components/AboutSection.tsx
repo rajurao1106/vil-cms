@@ -9,13 +9,17 @@ const ReactQuill = dynamic(() => import("react-quill-new"), {
   loading: () => <div className="h-72 bg-gray-100 animate-pulse rounded-2xl" />,
 });
 
-export default function AboutSection() {
-  const [data, setData] = useState({});
-  const [content, setContent] = useState("");
+interface AboutData {
+  tagLine?: string;
+  heading?: string;
+  content?: string;
+  ctaText?: string;
+  ctaLink?: string;
+}
 
-  useEffect(() => {
-    fetchData();
-  }, []);
+export default function AboutSection() {
+  const [data, setData] = useState<AboutData>({});
+  const [content, setContent] = useState("");
 
   const fetchData = async () => {
     try {
@@ -29,6 +33,10 @@ export default function AboutSection() {
       console.error("Failed to fetch:", err);
     }
   };
+
+  useEffect(() => {
+    fetchData();
+  }, []);
 
   const handleSave = async () => {
     // Combine local input state with the rich text editor state
@@ -58,22 +66,26 @@ export default function AboutSection() {
     }
   };
 
-  const modules = useMemo(() => ({
-    toolbar: [
-      [{ header: [1, 2, false] }],
-      ["bold", "italic", "underline", "strike", "blockquote"],
-      [{ list: "ordered" }, { list: "bullet" }],
-      ["link", "image"],
-      ["clean"],
-    ],
-  }), []);
+  const modules = useMemo(
+    () => ({
+      toolbar: [
+        [{ header: [1, 2, false] }],
+        ["bold", "italic", "underline", "strike", "blockquote"],
+        [{ list: "ordered" }, { list: "bullet" }],
+        ["link", "image"],
+        ["clean"],
+      ],
+    }),
+    [],
+  );
 
   return (
     <div className="max-w-4xl mx-auto p-4">
       <h2 className="text-3xl font-bold mb-8">About Snippet</h2>
       <div className="bg-white rounded-3xl p-8 shadow-sm border">
-        
-        <label className="block text-sm font-medium text-gray-600 mb-1">Tagline</label>
+        <label className="block text-sm font-medium text-gray-600 mb-1">
+          Tagline
+        </label>
         <input
           type="text"
           placeholder="Enter tagline..."
@@ -82,7 +94,9 @@ export default function AboutSection() {
           className="w-full border rounded-2xl px-4 py-3 mb-6 outline-teal-500"
         />
 
-        <label className="block text-sm font-medium text-gray-600 mb-1">Heading *</label>
+        <label className="block text-sm font-medium text-gray-600 mb-1">
+          Heading *
+        </label>
         <input
           type="text"
           placeholder="Enter heading..."
@@ -92,7 +106,9 @@ export default function AboutSection() {
         />
 
         <div className="mb-20">
-          <label className="block text-sm font-medium text-gray-600 mb-2">Main Content</label>
+          <label className="block text-sm font-medium text-gray-600 mb-2">
+            Main Content
+          </label>
           <ReactQuill
             theme="snow"
             value={content}
@@ -104,7 +120,9 @@ export default function AboutSection() {
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           <div>
-            <label className="block text-sm font-medium text-gray-600 mb-1">CTA Text</label>
+            <label className="block text-sm font-medium text-gray-600 mb-1">
+              CTA Text
+            </label>
             <input
               type="text"
               placeholder="e.g., Read More"
@@ -114,7 +132,9 @@ export default function AboutSection() {
             />
           </div>
           <div>
-            <label className="block text-sm font-medium text-gray-600 mb-1">CTA Link</label>
+            <label className="block text-sm font-medium text-gray-600 mb-1">
+              CTA Link
+            </label>
             <input
               type="text"
               placeholder="e.g., /about-us"

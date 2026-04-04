@@ -29,7 +29,6 @@ import documentRoutes from './routes/documentRoutes.js';
 import aboutSnippetRoutes from './routes/aboutSnippetRoutes.js';
 import statRoutes from './routes/statRoutes.js';
 import mapSettingRoutes from './routes/mapSettingRoutes.js';
-// Initialization
 dotenv.config();
 connectDB();
 

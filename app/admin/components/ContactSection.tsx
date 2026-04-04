@@ -1,8 +1,13 @@
 "use client";
 import React, { useState, useEffect } from "react";
 
+interface FAQ {
+  question: string;
+  answer: string;
+}
+
 export default function ContactSection() {
-  const [faqs, setFaqs] = useState([]);
+  const [faqs, setFaqs] = useState<FAQ[]>([]);
   const [mapSettings, setMapSettings] = useState({});
 
   useEffect(() => {

@@ -4,9 +4,9 @@ import dynamic from "next/dynamic";
 import "react-quill-new/dist/quill.snow.css";
 
 // Use dynamic import to fix the findDOMNode error
-const ReactQuill = dynamic(() => import("react-quill-new"), { 
+const ReactQuill = dynamic(() => import("react-quill-new"), {
   ssr: false,
-  loading: () => <div className="h-80 bg-gray-50 animate-pulse rounded-2xl" />
+  loading: () => <div className="h-80 bg-gray-50 animate-pulse rounded-2xl" />,
 });
 
 const categories = [
@@ -18,9 +18,15 @@ const categories = [
   "Familiarization",
 ];
 
+interface CompanyData {
+  pageTitle?: string;
+  subtitle?: string;
+  mainContent?: string;
+}
+
 export default function CompanySection() {
   const [selectedCategory, setSelectedCategory] = useState(categories[0]);
-  const [data, setData] = useState<any>({});
+  const [data, setData] = useState<CompanyData>({});
   const [content, setContent] = useState("");
 
   useEffect(() => {
@@ -31,10 +37,12 @@ export default function CompanySection() {
     try {
       // FIX: Use encodeURIComponent to handle spaces and "&" in category names
       const encodedCategory = encodeURIComponent(selectedCategory);
-      const res = await fetch(`http://localhost:1337/api/company/${encodedCategory}`);
-      
+      const res = await fetch(
+        `http://localhost:1337/api/company/${encodedCategory}`,
+      );
+
       if (!res.ok) {
-        // If the API returns a 404 because the section doesn't exist yet, 
+        // If the API returns a 404 because the section doesn't exist yet,
         // we just clear the form instead of throwing a hard error.
         setData({});
         setContent("");
@@ -108,7 +116,9 @@ export default function CompanySection() {
           </div>
 
           <div className="pb-12">
-            <label className="block text-sm font-medium mb-2">Main Content</label>
+            <label className="block text-sm font-medium mb-2">
+              Main Content
+            </label>
             <ReactQuill
               theme="snow"
               value={content}
@@ -118,7 +128,9 @@ export default function CompanySection() {
           </div>
 
           <div className="pt-8">
-            <label className="block text-sm font-medium mb-2">Section Image</label>
+            <label className="block text-sm font-medium mb-2">
+              Section Image
+            </label>
             <input
               type="file"
               name="sectionImage"

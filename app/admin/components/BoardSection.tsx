@@ -1,8 +1,15 @@
 "use client";
 import React, { useState, useEffect } from "react";
 
+interface Member {
+  _id: string;
+  fullName: string;
+  designation: string;
+  profileImageUrl: string;
+}
+
 export default function BoardSection() {
-  const [members, setMembers] = useState([]);
+  const [members, setMembers] = useState<Member[]>([]);
   const [showForm, setShowForm] = useState(false);
   const [formData, setFormData] = useState({
     fullName: "",
@@ -24,7 +31,7 @@ export default function BoardSection() {
     }
   };
 
-  const handleSubmit = async (e: { preventDefault: () => void; }) => {
+  const handleSubmit = async (e: { preventDefault: () => void }) => {
     e.preventDefault();
 
     // Changed from FormData to JSON
@@ -43,7 +50,9 @@ export default function BoardSection() {
 
   const deleteMember = async (id: string) => {
     if (!confirm("Delete member?")) return;
-    await fetch(`http://localhost:1337/api/board-members/${id}`, { method: "DELETE" });
+    await fetch(`http://localhost:1337/api/board-members/${id}`, {
+      method: "DELETE",
+    });
     fetchMembers();
   };
 

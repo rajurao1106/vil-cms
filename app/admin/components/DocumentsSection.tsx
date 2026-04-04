@@ -1,8 +1,15 @@
 "use client";
 import React, { useState, useEffect } from "react";
 
+interface Document {
+  _id: string;
+  documentTitle: string;
+  financialYear: string;
+  pdfPath: string;
+}
+
 export default function DocumentsSection() {
-  const [docs, setDocs] = useState([]);
+  const [docs, setDocs] = useState<Document[]>([]);
   const [uploading, setUploading] = useState(false);
 
   useEffect(() => {
@@ -19,8 +26,8 @@ export default function DocumentsSection() {
     }
   };
 
-  const handleFileUpload = async (e) => {
-    const file = e.target.files[0];
+  const handleFileUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
     if (!file) return;
 
     const formData = new FormData();
@@ -54,14 +61,14 @@ export default function DocumentsSection() {
     <div>
       <div className="flex justify-between items-center mb-8">
         <h2 className="text-3xl font-bold">Documents</h2>
-        
+
         {/* Upload Button Logic */}
         <label className="cursor-pointer bg-teal-600 text-white px-4 py-2 rounded-lg hover:bg-teal-700 transition">
           {uploading ? "Uploading..." : "Upload New Doc"}
-          <input 
-            type="file" 
-            className="hidden" 
-            onChange={handleFileUpload} 
+          <input
+            type="file"
+            className="hidden"
+            onChange={handleFileUpload}
             disabled={uploading}
             accept=".pdf,.doc,.docx"
           />

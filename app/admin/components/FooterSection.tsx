@@ -1,8 +1,15 @@
 "use client";
 import React, { useState, useEffect } from "react";
 
+interface Link {
+  _id: string;
+  title: string;
+  url: string;
+  section: string;
+}
+
 export default function FooterSection() {
-  const [links, setLinks] = useState([]);
+  const [links, setLinks] = useState<Link[]>([]);
 
   useEffect(() => {
     fetchLinks();

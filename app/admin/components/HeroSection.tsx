@@ -43,7 +43,7 @@ export default function HeroSection() {
     }
   };
 
-  const handleSubmit = async (e) => {
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     const fd = new FormData();
     Object.keys(formData).forEach((key) => {
@@ -169,7 +169,7 @@ export default function HeroSection() {
                   onChange={(e) =>
                     setFormData({
                       ...formData,
-                      backgroundImagePath: e.target.files[0],
+                      backgroundImagePath: e.target.files?.[0],
                     })
                   }
                   className="w-full border rounded-2xl px-4 py-3 mt-2"

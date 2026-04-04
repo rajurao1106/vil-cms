@@ -1,18 +1,35 @@
 "use client";
+
 import React, { useState, useEffect } from "react";
 
+// --- Types ---
+interface Specification {
+  label: string;
+  value: string;
+}
+
+interface Product {
+  _id?: string;
+  productName: string;
+  urlSlug: string;
+  category: string;
+  status: "Published" | "Draft";
+  shortDescription: string;
+  specifications: Specification[];
+}
+
 export default function ProductsSection() {
-  const [products, setProducts] = useState([]);
-  const [loading, setLoading] = useState(true);
-  
+  const [products, setProducts] = useState<Product[]>([]);
+  const [loading, setLoading] = useState<boolean>(true);
+
   // Form State
-  const [formData, setFormData] = useState({
+  const [formData, setFormData] = useState<Product>({
     productName: "",
     urlSlug: "",
     category: "",
     status: "Published",
     shortDescription: "",
-    specifications: [{ label: "", value: "" }] // Dynamic specs array
+    specifications: [{ label: "", value: "" }],
   });
 
   useEffect(() => {
@@ -23,36 +40,44 @@ export default function ProductsSection() {
     try {
       const res = await fetch("http://localhost:1337/api/products");
       const data = await res.json();
+      // Handle different API response structures
       const productsArray = Array.isArray(data) ? data : data.data || [];
       setProducts(productsArray);
-      setLoading(false);
     } catch (err) {
       console.error("Fetch error:", err);
+    } finally {
       setLoading(false);
     }
   };
 
   // Handle Input Changes
-  const handleChange = (e) => {
-    setFormData({ ...formData, [e.target.name]: e.target.value });
+  const handleChange = (
+    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>
+  ) => {
+    const { name, value } = e.target;
+    setFormData((prev) => ({ ...prev, [name]: value }));
   };
 
   // Dynamic Specs Logic
-  const handleSpecChange = (index, field, value) => {
+  const handleSpecChange = (
+    index: number,
+    field: keyof Specification,
+    value: string
+  ) => {
     const newSpecs = [...formData.specifications];
     newSpecs[index][field] = value;
-    setFormData({ ...formData, specifications: newSpecs });
+    setFormData((prev) => ({ ...prev, specifications: newSpecs }));
   };
 
   const addSpecField = () => {
-    setFormData({
-      ...formData,
-      specifications: [...formData.specifications, { label: "", value: "" }]
-    });
+    setFormData((prev) => ({
+      ...prev,
+      specifications: [...prev.specifications, { label: "", value: "" }],
+    }));
   };
 
   // Submit Form
-  const handleSubmit = async (e) => {
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     try {
       const res = await fetch("http://localhost:1337/api/products/add", {
@@ -64,10 +89,14 @@ export default function ProductsSection() {
       if (res.ok) {
         alert("Product added successfully!");
         setFormData({
-          productName: "", urlSlug: "", category: "", status: "Published",
-          shortDescription: "", specifications: [{ label: "", value: "" }]
+          productName: "",
+          urlSlug: "",
+          category: "",
+          status: "Published",
+          shortDescription: "",
+          specifications: [{ label: "", value: "" }],
         });
-        fetchProducts(); // List refresh karein
+        fetchProducts(); // Refresh list
       }
     } catch (err) {
       alert("Error adding product");
@@ -76,7 +105,6 @@ export default function ProductsSection() {
 
   return (
     <div className="max-w-5xl mx-auto p-6 space-y-10">
-      
       {/* --- ADD PRODUCT FORM --- */}
       <section className="bg-white p-8 rounded-3xl shadow-sm border border-gray-100">
         <h2 className="text-2xl font-bold mb-6">Add New Product</h2>
@@ -110,7 +138,7 @@ export default function ProductsSection() {
             />
             <select
               name="status"
-              className="p-3 border rounded-xl outline-none"
+              className="p-3 border rounded-xl outline-none focus:ring-2 focus:ring-blue-500"
               value={formData.status}
               onChange={handleChange}
             >
@@ -122,34 +150,41 @@ export default function ProductsSection() {
           <textarea
             name="shortDescription"
             placeholder="Short Description"
-            className="w-full p-3 border rounded-xl outline-none"
+            className="w-full p-3 border rounded-xl outline-none focus:ring-2 focus:ring-blue-500"
+            rows={3}
             value={formData.shortDescription}
             onChange={handleChange}
           />
 
           {/* Dynamic Specifications */}
           <div className="space-y-2">
-            <label className="font-semibold block text-gray-700">Specifications:</label>
+            <label className="font-semibold block text-gray-700">
+              Specifications:
+            </label>
             {formData.specifications.map((spec, index) => (
               <div key={index} className="flex gap-2">
                 <input
                   placeholder="Label (e.g. Size)"
-                  className="flex-1 p-2 border rounded-lg text-sm"
+                  className="flex-1 p-2 border rounded-lg text-sm outline-none focus:border-blue-500"
                   value={spec.label}
-                  onChange={(e) => handleSpecChange(index, "label", e.target.value)}
+                  onChange={(e) =>
+                    handleSpecChange(index, "label", e.target.value)
+                  }
                 />
                 <input
                   placeholder="Value (e.g. 10x12)"
-                  className="flex-1 p-2 border rounded-lg text-sm"
+                  className="flex-1 p-2 border rounded-lg text-sm outline-none focus:border-blue-500"
                   value={spec.value}
-                  onChange={(e) => handleSpecChange(index, "value", e.target.value)}
+                  onChange={(e) =>
+                    handleSpecChange(index, "value", e.target.value)
+                  }
                 />
               </div>
             ))}
             <button
               type="button"
               onClick={addSpecField}
-              className="text-sm text-blue-600 hover:underline"
+              className="text-sm text-blue-600 hover:underline font-medium"
             >
               + Add another specification
             </button>
@@ -157,7 +192,7 @@ export default function ProductsSection() {
 
           <button
             type="submit"
-            className="w-full bg-blue-600 text-white font-bold py-3 rounded-xl hover:bg-blue-700 transition"
+            className="w-full bg-blue-600 text-white font-bold py-3 rounded-xl hover:bg-blue-700 transition shadow-md"
           >
             Save Product
           </button>
@@ -170,29 +205,46 @@ export default function ProductsSection() {
       <section>
         <h2 className="text-2xl font-bold mb-6">Product Inventory</h2>
         <div className="bg-white rounded-3xl shadow-sm border border-gray-100 overflow-hidden">
-          <table className="w-full text-left">
-            <thead className="bg-gray-50 border-b">
+          <table className="w-full text-left border-collapse">
+            <thead className="bg-gray-50 border-b border-gray-100">
               <tr>
-                <th className="p-4 font-semibold">Name</th>
-                <th className="p-4 font-semibold">Category</th>
-                <th className="p-4 font-semibold">Status</th>
+                <th className="p-4 font-semibold text-gray-600">Name</th>
+                <th className="p-4 font-semibold text-gray-600">Category</th>
+                <th className="p-4 font-semibold text-gray-600">Status</th>
               </tr>
             </thead>
-            <tbody>
+            <tbody className="divide-y divide-gray-50">
               {loading ? (
-                <tr><td colSpan="3" className="p-10 text-center">Loading...</td></tr>
+                <tr>
+                  <td colSpan={3} className="p-10 text-center text-gray-400 italic">
+                    Loading inventory...
+                  </td>
+                </tr>
+              ) : products.length === 0 ? (
+                <tr>
+                  <td colSpan={3} className="p-10 text-center text-gray-400">
+                    No products found.
+                  </td>
+                </tr>
               ) : (
-                products.map((p) => (
-                  <tr key={p._id} className="border-b last:border-0 hover:bg-gray-50">
+                products.map((p, idx) => (
+                  <tr
+                    key={p._id || idx}
+                    className="hover:bg-gray-50 transition-colors"
+                  >
                     <td className="p-4">
-                      <div className="font-medium">{p.productName}</div>
-                      <div className="text-xs text-gray-400">{p.urlSlug}</div>
+                      <div className="font-medium text-gray-900">{p.productName}</div>
+                      <div className="text-xs text-gray-400 font-mono">{p.urlSlug}</div>
                     </td>
-                    <td className="p-4 text-gray-600">{p.category}</td>
+                    <td className="p-4 text-gray-600">{p.category || "N/A"}</td>
                     <td className="p-4">
-                      <span className={`px-3 py-1 rounded-full text-xs ${
-                        p.status === "Published" ? "bg-green-100 text-green-700" : "bg-yellow-100 text-yellow-700"
-                      }`}>
+                      <span
+                        className={`px-3 py-1 rounded-full text-xs font-medium ${
+                          p.status === "Published"
+                            ? "bg-green-100 text-green-700"
+                            : "bg-yellow-100 text-yellow-700"
+                        }`}
+                      >
                         {p.status}
                       </span>
                     </td>

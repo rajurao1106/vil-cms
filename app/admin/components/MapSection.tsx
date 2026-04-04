@@ -1,8 +1,13 @@
 "use client";
 import React, { useState, useEffect } from "react";
 
+interface MapData {
+  mapIframeLink?: string;
+  mapLocationLink?: string;
+}
+
 export default function MapSection() {
-  const [mapData, setMapData] = useState({});
+  const [mapData, setMapData] = useState<MapData>({});
 
   useEffect(() => {
     fetchMap();
@@ -14,9 +19,9 @@ export default function MapSection() {
     setMapData(data || {});
   };
 
-  const handleSave = async (e) => {
+  const handleSave = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    const fd = new FormData(e.target);
+    const fd = new FormData(e.target as HTMLFormElement);
     await fetch("http://localhost:1337/api/map/save", {
       method: "POST",
       body: fd,
@@ -33,13 +38,13 @@ export default function MapSection() {
       >
         <input
           name="mapIframeLink"
-          defaultValue={mapData.mapIframeLink}
+          defaultValue={mapData.mapIframeLink || ""}
           placeholder="Map Iframe Link"
           className="w-full border rounded-2xl px-4 py-3"
         />
         <input
           name="mapLocationLink"
-          defaultValue={mapData.mapLocationLink}
+          defaultValue={mapData.mapLocationLink || ""}
           placeholder="Map Location Link"
           className="w-full border rounded-2xl px-4 py-3"
         />

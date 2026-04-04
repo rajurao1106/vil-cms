@@ -53,7 +53,7 @@ export default function DocumentsSection() {
       console.error("Error uploading file:", error);
     } finally {
       setUploading(false);
-      e.target.value = null; // Clear the input
+      e.target.value = ""; // Clear the input
     }
   };
 

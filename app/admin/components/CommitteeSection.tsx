@@ -1,5 +1,6 @@
 "use client";
 import React, { useState, useEffect } from "react";
+import  Image from "next/image";
 
 interface Member {
   _id?: string;
@@ -17,6 +18,7 @@ export default function BoardSection() {
     designation: "",
     profileImageUrl: "",
   });
+  const [imageSrcs, setImageSrcs] = useState<Record<string, string>>({});
 
   useEffect(() => {
     fetchMembers();
@@ -98,38 +100,42 @@ export default function BoardSection() {
             </tr>
           </thead>
           <tbody className="divide-y divide-gray-100">
-            {members.map((member) => (
-              <tr
-                key={member._id || member.id}
-                className="hover:bg-gray-50/50 transition-colors"
-              >
-                <td className="py-4 px-6 font-medium text-gray-900">
-                  {member.fullName}
-                </td>
-                <td className="py-4 px-6 text-gray-600">
-                  {member.designation}
-                </td>
-                <td className="py-4 px-6">
-                  <img
-                    src={member.profileImageUrl}
-                    alt={member.fullName}
-                    className="w-12 h-12 rounded-xl object-cover bg-gray-100"
-                    onError={(e) => {
-                      e.target.src =
-                        "https://via.placeholder.com/150?text=No+Image";
-                    }}
-                  />
-                </td>
-                <td className="py-4 px-6 text-right">
-                  <button
-                    onClick={() => deleteMember(member._id || member.id)}
-                    className="text-red-500 hover:text-red-700 font-medium text-sm"
-                  >
-                    Delete
-                  </button>
-                </td>
-              </tr>
-            ))}
+            {members.map((member) => {
+              const key = member._id || member.id || "";
+              return (
+                <tr key={key} className="hover:bg-gray-50/50 transition-colors">
+                  <td className="py-4 px-6 font-medium text-gray-900">
+                    {member.fullName}
+                  </td>
+                  <td className="py-4 px-6 text-gray-600">
+                    {member.designation}
+                  </td>
+                  <td className="py-4 px-6">
+                    <Image
+                      src={imageSrcs[key] || member.profileImageUrl}
+                      alt={member.fullName}
+                      width={48}
+                      height={48}
+                      className="rounded-xl object-cover bg-gray-100"
+                      onError={() =>
+                        setImageSrcs((prev) => ({
+                          ...prev,
+                          [key]: "",
+                        }))
+                      }
+                    />
+                  </td>
+                  <td className="py-4 px-6 text-right">
+                    <button
+                      onClick={() => deleteMember(key)}
+                      className="text-red-500 hover:text-red-700 font-medium text-sm"
+                    >
+                      Delete
+                    </button>
+                  </td>
+                </tr>
+              );
+            })}
           </tbody>
         </table>
       </div>

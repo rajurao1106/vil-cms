@@ -26,7 +26,7 @@ import ReviewsSection from './components/ReviewsSection';
 import FooterSection from './components/FooterSection';
 import AddressSection from './components/AddressSection';
 import MapSection from './components/MapSection';
-import ContactSection from './components/ContactSection.tsx';
+import ContactSection from './components/ContactSection';
 
 const sections = [
   { id: 'dashboard', label: 'Dashboard', icon: FaHome },

@@ -1,8 +1,15 @@
 "use client";
 import React, { useState, useEffect } from "react";
 
+interface MediaItem {
+  _id?: string;
+  id?: string;
+  filePath: string;
+  category?: string;
+}
+
 export default function MediaSection() {
-  const [media, setMedia] = useState([]);
+  const [media, setMedia] = useState<MediaItem[]>([]);
   const [uploading, setUploading] = useState(false);
 
   // 1. GET: Fetch existing media
@@ -22,12 +29,14 @@ export default function MediaSection() {
   }, []);
 
   // 2. POST: Upload new media
-  const handleFileUpload = async (event) => {
+  const handleFileUpload = async (
+    event: React.ChangeEvent<HTMLInputElement>,
+  ) => {
+    if (!event.target.files || event.target.files.length === 0) return;
     const file = event.target.files[0];
-    if (!file) return;
 
     const formData = new FormData();
-    formData.append("file", file); 
+    formData.append("file", file);
     // If your API requires a category or other fields, append them here:
     // formData.append("category", "General");
 
@@ -56,14 +65,14 @@ export default function MediaSection() {
     <div className="p-6">
       <div className="flex justify-between items-center mb-8">
         <h2 className="text-3xl font-bold">Media Gallery</h2>
-        
+
         {/* Upload Button */}
         <label className="cursor-pointer bg-blue-600 text-white px-6 py-2 rounded-full hover:bg-blue-700 transition">
           {uploading ? "Uploading..." : "Upload Image"}
-          <input 
-            type="file" 
-            className="hidden" 
-            onChange={handleFileUpload} 
+          <input
+            type="file"
+            className="hidden"
+            onChange={handleFileUpload}
             disabled={uploading}
             accept="image/*"
           />
@@ -78,7 +87,11 @@ export default function MediaSection() {
             className="bg-white rounded-3xl overflow-hidden shadow-lg hover:shadow-xl transition"
           >
             <img
-              src={item.filePath.startsWith('http') ? item.filePath : `http://localhost:1337${item.filePath}`}
+              src={
+                item.filePath.startsWith("http")
+                  ? item.filePath
+                  : `http://localhost:1337${item.filePath}`
+              }
               alt={item.category || "Media"}
               className="w-full h-48 object-cover"
             />

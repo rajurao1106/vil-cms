@@ -1,8 +1,19 @@
 "use client";
 import React, { useState, useEffect } from "react";
 
+interface Job {
+  _id: string;
+  jobTitle: string;
+  department: string;
+  location: string;
+  jobType: string;
+  isActive: boolean;
+  description: string;
+  requirements: string;
+}
+
 export default function JobsSection() {
-  const [jobs, setJobs] = useState([]);
+  const [jobs, setJobs] = useState<Job[]>([]);
   const [loading, setLoading] = useState(true);
 
   // Form State

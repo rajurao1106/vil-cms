@@ -1,12 +1,22 @@
 "use client";
+
 import React, { useState, useEffect } from "react";
 
+// --- Types ---
+interface Programme {
+  _id?: string;
+  programmeTitle: string;
+  reviewDate: string;
+  programmeContent: string;
+  pdfUrl: string;
+}
+
 export default function ProgrammesSection() {
-  const [programmes, setProgrammes] = useState([]);
-  const [loading, setLoading] = useState(true);
+  const [programmes, setProgrammes] = useState<Programme[]>([]);
+  const [loading, setLoading] = useState<boolean>(true);
 
   // Form State
-  const [formData, setFormData] = useState({
+  const [formData, setFormData] = useState<Programme>({
     programmeTitle: "",
     reviewDate: "",
     programmeContent: "",
@@ -21,19 +31,24 @@ export default function ProgrammesSection() {
     try {
       const res = await fetch("http://localhost:1337/api/programmes");
       const data = await res.json();
-      setProgrammes(Array.isArray(data) ? data : data.data || []);
-      setLoading(false);
+      // Supporting both direct arrays and Strapi-style { data: [] } objects
+      const programmesArray = Array.isArray(data) ? data : data.data || [];
+      setProgrammes(programmesArray);
     } catch (err) {
       console.error("Fetch error:", err);
+    } finally {
       setLoading(false);
     }
   };
 
-  const handleChange = (e) => {
-    setFormData({ ...formData, [e.target.name]: e.target.value });
+  const handleChange = (
+    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
+  ) => {
+    const { name, value } = e.target;
+    setFormData((prev) => ({ ...prev, [name]: value }));
   };
 
-  const handleSubmit = async (e) => {
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     try {
       const res = await fetch("http://localhost:1337/api/programmes/add", {
@@ -44,7 +59,12 @@ export default function ProgrammesSection() {
 
       if (res.ok) {
         alert("Programme added successfully!");
-        setFormData({ programmeTitle: "", reviewDate: "", programmeContent: "", pdfUrl: "" });
+        setFormData({
+          programmeTitle: "",
+          reviewDate: "",
+          programmeContent: "",
+          pdfUrl: "",
+        });
         fetchProgrammes();
       }
     } catch (err) {
@@ -53,7 +73,7 @@ export default function ProgrammesSection() {
   };
 
   return (
-    <div className="max-w-4xl mx-auto p-6 space-y-12">
+    <div className="max-w-4xl mx-auto p-6 space-y-12 text-gray-800">
       
       {/* --- ADD PROGRAMME FORM --- */}
       <section className="bg-white p-8 rounded-3xl shadow-sm border border-gray-100">
@@ -65,7 +85,7 @@ export default function ProgrammesSection() {
               <input
                 name="programmeTitle"
                 placeholder="e.g. Annual Review 2026"
-                className="p-3 border rounded-xl outline-none focus:ring-2 focus:ring-indigo-500"
+                className="p-3 border rounded-xl outline-none focus:ring-2 focus:ring-indigo-500 transition-all"
                 value={formData.programmeTitle}
                 onChange={handleChange}
                 required
@@ -76,7 +96,7 @@ export default function ProgrammesSection() {
               <input
                 type="date"
                 name="reviewDate"
-                className="p-3 border rounded-xl outline-none focus:ring-2 focus:ring-indigo-500"
+                className="p-3 border rounded-xl outline-none focus:ring-2 focus:ring-indigo-500 transition-all"
                 value={formData.reviewDate}
                 onChange={handleChange}
                 required
@@ -89,7 +109,7 @@ export default function ProgrammesSection() {
             <input
               name="pdfUrl"
               placeholder="https://example.com/document.pdf"
-              className="p-3 border rounded-xl outline-none focus:ring-2 focus:ring-indigo-500"
+              className="p-3 border rounded-xl outline-none focus:ring-2 focus:ring-indigo-500 transition-all"
               value={formData.pdfUrl}
               onChange={handleChange}
             />
@@ -100,13 +120,16 @@ export default function ProgrammesSection() {
             <textarea
               name="programmeContent"
               placeholder="Describe the programme details here..."
-              className="w-full p-3 border rounded-xl h-32 font-mono text-sm outline-none focus:ring-2 focus:ring-indigo-500"
+              className="w-full p-3 border rounded-xl h-32 font-mono text-sm outline-none focus:ring-2 focus:ring-indigo-500 transition-all"
               value={formData.programmeContent}
               onChange={handleChange}
             />
           </div>
 
-          <button className="w-full bg-indigo-600 text-white font-bold py-3 rounded-xl hover:bg-indigo-700 transition shadow-lg shadow-indigo-100">
+          <button 
+            type="submit"
+            className="w-full bg-indigo-600 text-white font-bold py-3 rounded-xl hover:bg-indigo-700 transition shadow-lg shadow-indigo-100 active:scale-[0.98]"
+          >
             Save Programme
           </button>
         </form>
@@ -117,18 +140,26 @@ export default function ProgrammesSection() {
         <h2 className="text-3xl font-bold mb-8 text-gray-800">Active Programmes</h2>
         <div className="space-y-6">
           {loading ? (
-            <p className="text-center text-gray-400">Fetching schedules...</p>
+            <div className="flex flex-col items-center justify-center py-10 space-y-3">
+              <div className="w-8 h-8 border-4 border-indigo-200 border-t-indigo-600 rounded-full animate-spin"></div>
+              <p className="text-gray-400 animate-pulse">Fetching schedules...</p>
+            </div>
           ) : programmes.length > 0 ? (
-            programmes.map((p) => (
-              <div key={p._id} className="bg-white p-6 rounded-3xl shadow-sm border border-gray-100 flex flex-col md:flex-row justify-between items-start md:items-center gap-4 hover:shadow-md transition-shadow">
+            programmes.map((p, idx) => (
+              <div 
+                key={p._id || idx} 
+                className="bg-white p-6 rounded-3xl shadow-sm border border-gray-100 flex flex-col md:flex-row justify-between items-start md:items-center gap-4 hover:shadow-md transition-shadow"
+              >
                 <div>
                   <h3 className="text-xl font-bold text-gray-900">{p.programmeTitle}</h3>
                   <div className="flex items-center gap-3 mt-1">
                     <span className="text-sm bg-indigo-50 text-indigo-600 px-2 py-0.5 rounded-md font-medium">
-                      📅 {new Date(p.reviewDate).toLocaleDateString("en-GB", { day: 'numeric', month: 'long', year: 'numeric' })}
+                      📅 {p.reviewDate ? new Date(p.reviewDate).toLocaleDateString("en-GB", { day: 'numeric', month: 'long', year: 'numeric' }) : 'No date set'}
                     </span>
                     {p.pdfUrl && (
-                      <span className="text-xs text-gray-400">PDF Attached</span>
+                      <span className="text-[10px] uppercase tracking-wider bg-gray-100 text-gray-500 px-2 py-0.5 rounded-md font-bold">
+                        PDF Attached
+                      </span>
                     )}
                   </div>
                 </div>
@@ -151,7 +182,8 @@ export default function ProgrammesSection() {
               </div>
             ))
           ) : (
-            <div className="text-center py-10 bg-gray-50 rounded-3xl border-2 border-dashed">
+            <div className="text-center py-16 bg-gray-50 rounded-3xl border-2 border-dashed border-gray-200">
+              <div className="text-4xl mb-2">📁</div>
               <p className="text-gray-400">No programmes listed yet.</p>
             </div>
           )}

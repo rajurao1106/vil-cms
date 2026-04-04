@@ -23,19 +23,16 @@ import footerRoutes from './routes/footerRoutes.js';
 import contactRoutes from './routes/contactRoutes.js';
 import addressRoutes from './routes/addressRoutes.js';
 import mapRoutes from './routes/mapRoutes.js';
-import contactPageRoutes from './routes/contactPageRoutes.js';
+import contactPageRoutes from './routes/contactPageRoutes.js'; // FAQ & Map Settings
 import jobRoutes from './routes/jobRoutes.js';
 import documentRoutes from './routes/documentRoutes.js';
 import aboutSnippetRoutes from './routes/aboutSnippetRoutes.js';
 import statRoutes from './routes/statRoutes.js';
 import mapSettingRoutes from './routes/mapSettingRoutes.js';
-
 dotenv.config();
 connectDB();
 
 const app = express();
-
-// Fix __dirname in ES modules
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
@@ -43,20 +40,18 @@ const __dirname = path.dirname(__filename);
 app.use(cors());
 app.use(express.json());
 
-// Static folder
+// Static Folders for Uploads (Images/PDFs)
 app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 
-// Routes
-
-// Home & About
+// Home & About Sections
 app.use('/api/hero-sliders', heroRoutes);
 app.use('/api/company', companyRoutes);
 app.use('/api/vision-mission', visionRoutes);
 app.use('/api/chairman-message', chairmanRoutes);
 
-// Team
+// Team & Governance
 app.use('/api/board-members', boardRoutes);
-app.use('/api/committees', committeeRoutes);
+app.use('/api/committees', committeeRoutes); 
 app.use('/api/programmes', programmeRoutes);
 
 // Products & Content
@@ -65,32 +60,36 @@ app.use('/api/posts', postRoutes);
 app.use('/api/media', mediaRoutes);
 app.use('/api/reviews', reviewRoutes);
 
-// Footer
+// Footer & Global Links
 app.use('/api/footer-links', footerRoutes);
 
-// Contact & Location
+// Contact Page & Location
 app.use('/api/contact-info', contactRoutes);
 app.use('/api/addresses', addressRoutes);
 app.use('/api/map-location', mapRoutes);
-app.use('/api/contact-page-settings', contactPageRoutes);
-app.use('/api/map-settings', mapSettingRoutes);
-
-// Careers & Docs
+app.use('/api/contact-page-settings', contactPageRoutes); // FAQ & Map Embed
+app.use('/api/map-settings', mapSettingRoutes); // New Map Settings Route
+// Careers & Investor Relations
 app.use('/api/jobs', jobRoutes);
 app.use('/api/documents', documentRoutes);
 
-// Misc
 app.use('/api/about-snippet', aboutSnippetRoutes);
+
+
+// ... existing code ...
+
 app.use('/api/stats', statRoutes);
 
-// Test route
 app.get("/", (req, res) => {
   res.send("API running...");
 });
-
-// Start server
 const PORT = process.env.PORT || 1337;
 
-app.listen(PORT, () => {
-  console.log(`🚀 Server running on port ${PORT}`);
-});
+// Only run server in local environment
+if (process.env.NODE_ENV !== "production") {
+  app.listen(PORT, () => {
+    console.log(`🚀 Server running on port ${PORT}`);
+  });
+}
+
+export default app; 

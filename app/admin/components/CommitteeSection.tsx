@@ -1,8 +1,16 @@
 "use client";
 import React, { useState, useEffect } from "react";
 
+interface Member {
+  _id?: string;
+  id?: string;
+  fullName: string;
+  designation: string;
+  profileImageUrl: string;
+}
+
 export default function BoardSection() {
-  const [members, setMembers] = useState([]);
+  const [members, setMembers] = useState<Member[]>([]);
   const [showForm, setShowForm] = useState(false);
   const [formData, setFormData] = useState({
     fullName: "",

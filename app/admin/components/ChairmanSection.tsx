@@ -30,7 +30,9 @@ export default function ChairmanSection() {
     setError(null);
     try {
       // Note: Ensure this URL matches your backend route exactly
-      const res = await fetch("http://localhost:1337/api/chairman-message");
+      const res = await fetch(
+        "https://vil-cms.vercel.app/api/chairman-message",
+      );
 
       if (!res.ok) {
         throw new Error(`Server responded with status: ${res.status}`);
@@ -70,7 +72,7 @@ export default function ChairmanSection() {
 
     try {
       const res = await fetch(
-        "http://localhost:1337/api/chairman-message/save",
+        "https://vil-cms.vercel.app/api/chairman-message/save",
         {
           method: "POST",
           headers: {

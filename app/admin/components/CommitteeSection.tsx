@@ -1,6 +1,6 @@
 "use client";
 import React, { useState, useEffect } from "react";
-import  Image from "next/image";
+import Image from "next/image";
 
 interface Member {
   _id?: string;
@@ -26,7 +26,7 @@ export default function BoardSection() {
 
   const fetchMembers = async () => {
     try {
-      const res = await fetch("http://localhost:1337/api/board-members");
+      const res = await fetch("https://vil-cms.vercel.app/api/board-members");
       const data = await res.json();
       // Ensure we handle cases where the API might return an object with a data property
       setMembers(Array.isArray(data) ? data : data.data || []);
@@ -39,13 +39,16 @@ export default function BoardSection() {
     e.preventDefault();
 
     try {
-      const res = await fetch("http://localhost:1337/api/board-members/add", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
+      const res = await fetch(
+        "https://vil-cms.vercel.app/api/board-members/add",
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(formData),
         },
-        body: JSON.stringify(formData),
-      });
+      );
 
       if (res.ok) {
         setShowForm(false);
@@ -60,7 +63,7 @@ export default function BoardSection() {
   const deleteMember = async (id: string | number) => {
     if (!confirm("Are you sure you want to delete this member?")) return;
     try {
-      await fetch(`http://localhost:1337/api/board/${id}`, {
+      await fetch(`https://vil-cms.vercel.app/api/board/${id}`, {
         method: "DELETE",
       });
       fetchMembers();

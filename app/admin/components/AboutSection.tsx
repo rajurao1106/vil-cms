@@ -23,7 +23,7 @@ export default function AboutSection() {
 
   const fetchData = async () => {
     try {
-      const res = await fetch("http://localhost:1337/api/about-snippet");
+      const res = await fetch("https://vil-cms.vercel.app/api/about-snippet");
       const json = await res.json();
       if (res.ok) {
         setData(json || {});
@@ -46,13 +46,16 @@ export default function AboutSection() {
     };
 
     try {
-      const res = await fetch("http://localhost:1337/api/about-snippet/save", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
+      const res = await fetch(
+        "https://vil-cms.vercel.app/api/about-snippet/save",
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(payload),
         },
-        body: JSON.stringify(payload),
-      });
+      );
 
       if (res.ok) {
         alert("About Snippet Saved Successfully!");

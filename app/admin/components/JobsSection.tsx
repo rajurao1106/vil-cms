@@ -33,7 +33,7 @@ export default function JobsSection() {
 
   const fetchJobs = async () => {
     try {
-      const res = await fetch("http://localhost:1337/api/jobs");
+      const res = await fetch("https://vil-cms.vercel.app/api/jobs");
       const data = await res.json();
       setJobs(Array.isArray(data) ? data : data.data || []);
       setLoading(false);
@@ -63,7 +63,7 @@ export default function JobsSection() {
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     try {
-      const res = await fetch("http://localhost:1337/api/jobs", {
+      const res = await fetch("https://vil-cms.vercel.app/api/jobs", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(formData),

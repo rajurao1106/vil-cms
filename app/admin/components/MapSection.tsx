@@ -14,7 +14,7 @@ export default function MapSection() {
   }, []);
 
   const fetchMap = async () => {
-    const res = await fetch("http://localhost:1337/api/map");
+    const res = await fetch("https://vil-cms.vercel.app/api/map");
     const data = await res.json();
     setMapData(data || {});
   };
@@ -22,7 +22,7 @@ export default function MapSection() {
   const handleSave = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     const fd = new FormData(e.target as HTMLFormElement);
-    await fetch("http://localhost:1337/api/map/save", {
+    await fetch("https://vil-cms.vercel.app/api/map/save", {
       method: "POST",
       body: fd,
     });

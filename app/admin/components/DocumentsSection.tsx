@@ -18,7 +18,7 @@ export default function DocumentsSection() {
 
   const fetchDocs = async () => {
     try {
-      const res = await fetch("http://localhost:1337/api/documents");
+      const res = await fetch("https://vil-cms.vercel.app/api/documents");
       const data = await res.json();
       setDocs(data);
     } catch (error) {
@@ -38,10 +38,13 @@ export default function DocumentsSection() {
     setUploading(true);
 
     try {
-      const res = await fetch("http://localhost:1337/api/documents/upload", {
-        method: "POST",
-        body: formData,
-      });
+      const res = await fetch(
+        "https://vil-cms.vercel.app/api/documents/upload",
+        {
+          method: "POST",
+          body: formData,
+        },
+      );
 
       if (res.ok) {
         alert("Upload successful!");

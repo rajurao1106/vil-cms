@@ -15,7 +15,7 @@ export default function MediaSection() {
   // 1. GET: Fetch existing media
   const fetchMedia = async () => {
     try {
-      const res = await fetch("http://localhost:1337/api/documents");
+      const res = await fetch("https://vil-cms.vercel.app/api/documents");
       const data = await res.json();
       // Ensure data is an array based on your API response structure
       setMedia(Array.isArray(data) ? data : data.data || []);
@@ -43,7 +43,7 @@ export default function MediaSection() {
     setUploading(true);
 
     try {
-      const res = await fetch("http://localhost:1337/api/media/upload", {
+      const res = await fetch("https://vil-cms.vercel.app/api/media/upload", {
         method: "POST",
         body: formData, // No headers needed, browser sets Multipart/Form-Data automatically
       });
@@ -90,7 +90,7 @@ export default function MediaSection() {
               src={
                 item.filePath.startsWith("http")
                   ? item.filePath
-                  : `http://localhost:1337${item.filePath}`
+                  : `https://vil-cms.vercel.app${item.filePath}`
               }
               alt={item.category || "Media"}
               className="w-full h-48 object-cover"

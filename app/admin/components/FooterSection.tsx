@@ -16,7 +16,7 @@ export default function FooterSection() {
   }, []);
 
   const fetchLinks = async () => {
-    const res = await fetch("http://localhost:1337/api/footer");
+    const res = await fetch("https://vil-cms.vercel.app/api/footer");
     const data = await res.json();
     setLinks(data);
   };

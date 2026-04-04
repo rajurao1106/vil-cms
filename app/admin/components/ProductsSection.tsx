@@ -38,7 +38,7 @@ export default function ProductsSection() {
 
   const fetchProducts = async () => {
     try {
-      const res = await fetch("http://localhost:1337/api/products");
+      const res = await fetch("https://vil-cms.vercel.app/api/products");
       const data = await res.json();
       // Handle different API response structures
       const productsArray = Array.isArray(data) ? data : data.data || [];
@@ -52,7 +52,9 @@ export default function ProductsSection() {
 
   // Handle Input Changes
   const handleChange = (
-    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>
+    e: React.ChangeEvent<
+      HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement
+    >,
   ) => {
     const { name, value } = e.target;
     setFormData((prev) => ({ ...prev, [name]: value }));
@@ -62,7 +64,7 @@ export default function ProductsSection() {
   const handleSpecChange = (
     index: number,
     field: keyof Specification,
-    value: string
+    value: string,
   ) => {
     const newSpecs = [...formData.specifications];
     newSpecs[index][field] = value;
@@ -80,7 +82,7 @@ export default function ProductsSection() {
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     try {
-      const res = await fetch("http://localhost:1337/api/products/add", {
+      const res = await fetch("https://vil-cms.vercel.app/api/products/add", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(formData),
@@ -216,7 +218,10 @@ export default function ProductsSection() {
             <tbody className="divide-y divide-gray-50">
               {loading ? (
                 <tr>
-                  <td colSpan={3} className="p-10 text-center text-gray-400 italic">
+                  <td
+                    colSpan={3}
+                    className="p-10 text-center text-gray-400 italic"
+                  >
                     Loading inventory...
                   </td>
                 </tr>
@@ -233,8 +238,12 @@ export default function ProductsSection() {
                     className="hover:bg-gray-50 transition-colors"
                   >
                     <td className="p-4">
-                      <div className="font-medium text-gray-900">{p.productName}</div>
-                      <div className="text-xs text-gray-400 font-mono">{p.urlSlug}</div>
+                      <div className="font-medium text-gray-900">
+                        {p.productName}
+                      </div>
+                      <div className="text-xs text-gray-400 font-mono">
+                        {p.urlSlug}
+                      </div>
                     </td>
                     <td className="p-4 text-gray-600">{p.category || "N/A"}</td>
                     <td className="p-4">

@@ -15,12 +15,12 @@ export default function ContactSection() {
   }, []);
 
   const fetchContactData = async () => {
-    const faqRes = await fetch("http://localhost:1337/api/contact/faqs");
+    const faqRes = await fetch("https://vil-cms.vercel.app/api/contact/faqs");
     const faqData = await faqRes.json();
     setFaqs(faqData);
 
     const mapRes = await fetch(
-      "http://localhost:1337/api/contact/map-settings",
+      "https://vil-cms.vercel.app/api/contact/map-settings",
     );
     const mapData = await mapRes.json();
     setMapSettings(mapData || {});

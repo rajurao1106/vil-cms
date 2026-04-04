@@ -25,7 +25,7 @@ export default function HeroSection() {
   const [editing, setEditing] = useState<Slider | null>(null);
   const [formData, setFormData] = useState<SliderFormData>({});
 
-  const API = "http://localhost:1337/api/hero-sliders";
+  const API = "https://vil-cms.vercel.app/api/hero-sliders";
 
   useEffect(() => {
     fetchSliders();

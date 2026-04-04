@@ -38,7 +38,7 @@ export default function PostsSection() {
 
   const fetchPosts = async () => {
     try {
-      const res = await fetch("http://localhost:1337/api/posts");
+      const res = await fetch("https://vil-cms.vercel.app/api/posts");
       const data = await res.json();
       setPosts(Array.isArray(data) ? data : data.data || []);
       setLoading(false);
@@ -64,7 +64,7 @@ export default function PostsSection() {
     };
 
     try {
-      const res = await fetch("http://localhost:1337/api/posts", {
+      const res = await fetch("https://vil-cms.vercel.app/api/posts", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(finalData),

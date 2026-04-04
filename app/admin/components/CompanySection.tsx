@@ -38,7 +38,7 @@ export default function CompanySection() {
       // FIX: Use encodeURIComponent to handle spaces and "&" in category names
       const encodedCategory = encodeURIComponent(selectedCategory);
       const res = await fetch(
-        `http://localhost:1337/api/company/${encodedCategory}`,
+        `https://vil-cms.vercel.app/api/company/${encodedCategory}`,
       );
 
       if (!res.ok) {
@@ -66,7 +66,7 @@ export default function CompanySection() {
     fd.append("mainContent", content);
 
     try {
-      const res = await fetch("http://localhost:1337/api/company/save", {
+      const res = await fetch("https://vil-cms.vercel.app/api/company/save", {
         method: "POST",
         body: fd,
       });

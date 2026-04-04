@@ -12,7 +12,7 @@ export default function AddressSection() {
   const fetchAddress = async () => {
     try {
       setIsLoading(true);
-      const res = await fetch("http://localhost:1337/api/addresses/save");
+      const res = await fetch("https://vil-cms.vercel.app/api/addresses/save");
       const data = await res.json();
       // Ensure we have fallback strings to avoid uncontrolled input errors
       setAddress({
@@ -40,7 +40,7 @@ export default function AddressSection() {
   const handleSave = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     try {
-      const res = await fetch("http://localhost:1337/api/addresses/save", {
+      const res = await fetch("https://vil-cms.vercel.app/api/addresses/save", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(address),
@@ -60,7 +60,7 @@ export default function AddressSection() {
 
     try {
       // Assuming your backend supports DELETE or a POST with empty values
-      await fetch("http://localhost:1337/api/addresses/save", {
+      await fetch("https://vil-cms.vercel.app/api/addresses/save", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ headOffice: "", cityOffice: "" }),

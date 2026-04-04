@@ -23,7 +23,7 @@ export default function BoardSection() {
 
   const fetchMembers = async () => {
     try {
-      const res = await fetch("http://localhost:1337/api/board-members");
+      const res = await fetch("https://vil-cms.vercel.app/api/board-members");
       const data = await res.json();
       setMembers(data);
     } catch (error) {
@@ -35,7 +35,7 @@ export default function BoardSection() {
     e.preventDefault();
 
     // Changed from FormData to JSON
-    await fetch("http://localhost:1337/api/board-members/add", {
+    await fetch("https://vil-cms.vercel.app/api/board-members/add", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -50,7 +50,7 @@ export default function BoardSection() {
 
   const deleteMember = async (id: string) => {
     if (!confirm("Delete member?")) return;
-    await fetch(`http://localhost:1337/api/board-members/${id}`, {
+    await fetch(`https://vil-cms.vercel.app/api/board-members/${id}`, {
       method: "DELETE",
     });
     fetchMembers();

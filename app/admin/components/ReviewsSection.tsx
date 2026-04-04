@@ -38,9 +38,9 @@ export default function ReviewsSection() {
 
   const fetchReviews = async () => {
     try {
-      const res = await fetch("http://localhost:1337/api/reviews");
+      const res = await fetch("https://vil-cms.vercel.app/api/reviews");
       const data = await res.json();
-      
+
       // Normalize data based on API response structure
       const reviewsArray = Array.isArray(data) ? data : data.data || [];
       setReviews(reviewsArray);
@@ -54,7 +54,7 @@ export default function ReviewsSection() {
     setLoading(true);
 
     try {
-      const res = await fetch("http://localhost:1337/api/reviews", {
+      const res = await fetch("https://vil-cms.vercel.app/api/reviews", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         // Tip: If using Strapi, you may need: body: JSON.stringify({ data: formData })
@@ -74,14 +74,18 @@ export default function ReviewsSection() {
 
   return (
     <div className="max-w-2xl mx-auto p-4 space-y-8">
-      <h2 className="text-3xl font-bold mb-8 text-gray-900">Reviews / Testimonials</h2>
+      <h2 className="text-3xl font-bold mb-8 text-gray-900">
+        Reviews / Testimonials
+      </h2>
 
       {/* --- POST REVIEW FORM --- */}
-      <form 
-        onSubmit={handleSubmit} 
+      <form
+        onSubmit={handleSubmit}
         className="mb-12 bg-gray-50 p-6 rounded-3xl border border-gray-200 shadow-sm"
       >
-        <h3 className="text-xl font-semibold mb-4 text-gray-800">Leave a Review</h3>
+        <h3 className="text-xl font-semibold mb-4 text-gray-800">
+          Leave a Review
+        </h3>
         <div className="space-y-4">
           <input
             type="text"
@@ -91,12 +95,14 @@ export default function ReviewsSection() {
             onChange={(e) => setFormData({ ...formData, name: e.target.value })}
             required
           />
-          
+
           <div className="relative">
             <select
               className="w-full p-3 rounded-xl border border-gray-300 outline-none bg-white focus:ring-2 focus:ring-blue-500 transition-all appearance-none"
               value={formData.rating}
-              onChange={(e) => setFormData({ ...formData, rating: Number(e.target.value) })}
+              onChange={(e) =>
+                setFormData({ ...formData, rating: Number(e.target.value) })
+              }
             >
               {[5, 4, 3, 2, 1].map((num) => (
                 <option key={num} value={num}>
@@ -113,10 +119,12 @@ export default function ReviewsSection() {
             placeholder="Write your thoughts..."
             className="w-full p-3 rounded-xl border border-gray-300 outline-none h-32 focus:ring-2 focus:ring-blue-500 transition-all"
             value={formData.reviewText}
-            onChange={(e) => setFormData({ ...formData, reviewText: e.target.value })}
+            onChange={(e) =>
+              setFormData({ ...formData, reviewText: e.target.value })
+            }
             required
           />
-          
+
           <button
             type="submit"
             disabled={loading}
@@ -130,9 +138,11 @@ export default function ReviewsSection() {
       {/* --- REVIEWS LIST --- */}
       <div className="space-y-6">
         {reviews.length === 0 && !loading && (
-          <p className="text-center text-gray-500 italic">No reviews yet. Be the first to leave one!</p>
+          <p className="text-center text-gray-500 italic">
+            No reviews yet. Be the first to leave one!
+          </p>
         )}
-        
+
         {reviews.map((review) => {
           // Destructure for readability, handling both standard and Strapi formats
           const name = review.name || review.attributes?.name;
@@ -140,20 +150,20 @@ export default function ReviewsSection() {
           const text = review.reviewText || review.attributes?.reviewText;
 
           return (
-            <div 
-              key={review._id || review.id} 
+            <div
+              key={review._id || review.id}
               className="bg-white p-6 rounded-3xl shadow-sm border border-gray-100 hover:shadow-md transition-shadow"
             >
               <div className="flex justify-between items-center">
                 <p className="font-bold text-gray-900">{name}</p>
                 <div className="flex text-yellow-400 text-lg">
                   {"★".repeat(rating)}
-                  <span className="text-gray-200">{"★".repeat(5 - rating)}</span>
+                  <span className="text-gray-200">
+                    {"★".repeat(5 - rating)}
+                  </span>
                 </div>
               </div>
-              <p className="mt-3 text-gray-600 leading-relaxed">
-                {text}
-              </p>
+              <p className="mt-3 text-gray-600 leading-relaxed">{text}</p>
             </div>
           );
         })}

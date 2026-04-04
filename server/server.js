@@ -83,6 +83,13 @@ app.use('/api/stats', statRoutes);
 app.get("/", (req, res) => {
   res.send("API running...");
 });
+const PORT = process.env.PORT || 1337;
 
+// Only run server in local environment
+if (process.env.NODE_ENV !== "production") {
+  app.listen(PORT, () => {
+    console.log(`🚀 Server running on port ${PORT}`);
+  });
+}
 
 export default app;

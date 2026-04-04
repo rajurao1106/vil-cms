@@ -85,10 +85,11 @@ app.get("/", (req, res) => {
 });
 const PORT = process.env.PORT || 1337;
 
-if (process.env.NODE_ENV !== "production") {
+// Only run locally (NOT on Vercel)
+if (!process.env.VERCEL) {
   app.listen(PORT, () => {
     console.log(`🚀 Server running on port ${PORT}`);
-  }); 
+  });
 }
 
-export default app; 
+export default app;

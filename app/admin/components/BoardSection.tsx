@@ -24,7 +24,7 @@ export default function BoardSection() {
     }
   };
 
-  const handleSubmit = async (e) => {
+  const handleSubmit = async (e: { preventDefault: () => void; }) => {
     e.preventDefault();
 
     // Changed from FormData to JSON
@@ -41,7 +41,7 @@ export default function BoardSection() {
     fetchMembers();
   };
 
-  const deleteMember = async (id) => {
+  const deleteMember = async (id: string) => {
     if (!confirm("Delete member?")) return;
     await fetch(`http://localhost:1337/api/board-members/${id}`, { method: "DELETE" });
     fetchMembers();

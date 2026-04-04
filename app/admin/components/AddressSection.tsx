@@ -31,13 +31,13 @@ export default function AddressSection() {
   }, []);
 
   // Handle input changes (Update local state)
-  const handleChange = (e) => {
+  const handleChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
     const { name, value } = e.target;
     setAddress((prev) => ({ ...prev, [name]: value }));
   };
 
   // --- CREATE / UPDATE ---
-  const handleSave = async (e) => {
+  const handleSave = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     try {
       const res = await fetch("http://localhost:1337/api/addresses/save", {
@@ -82,7 +82,9 @@ export default function AddressSection() {
         className="bg-white rounded-3xl p-8 shadow space-y-6"
       >
         <div>
-          <label className="block mb-2 text-sm font-medium text-gray-700">Head Office</label>
+          <label className="block mb-2 text-sm font-medium text-gray-700">
+            Head Office
+          </label>
           <textarea
             name="headOffice"
             value={address.headOffice}
@@ -93,7 +95,9 @@ export default function AddressSection() {
         </div>
 
         <div>
-          <label className="block mb-2 text-sm font-medium text-gray-700">City Office</label>
+          <label className="block mb-2 text-sm font-medium text-gray-700">
+            City Office
+          </label>
           <textarea
             name="cityOffice"
             value={address.cityOffice}
@@ -110,7 +114,7 @@ export default function AddressSection() {
           >
             Save Addresses
           </button>
-          
+
           <button
             type="button"
             onClick={handleDelete}

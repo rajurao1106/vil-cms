@@ -25,7 +25,7 @@ export default function BoardSection() {
     }
   };
 
-  const handleSubmit = async (e) => {
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
 
     try {
@@ -47,10 +47,12 @@ export default function BoardSection() {
     }
   };
 
-  const deleteMember = async (id) => {
+  const deleteMember = async (id: string | number) => {
     if (!confirm("Are you sure you want to delete this member?")) return;
     try {
-      await fetch(`http://localhost:1337/api/board/${id}`, { method: "DELETE" });
+      await fetch(`http://localhost:1337/api/board/${id}`, {
+        method: "DELETE",
+      });
       fetchMembers();
     } catch (error) {
       console.error("Error deleting member:", error);
@@ -73,23 +75,41 @@ export default function BoardSection() {
         <table className="w-full text-left">
           <thead className="bg-gray-50 border-b">
             <tr>
-              <th className="py-4 px-6 text-sm font-semibold text-gray-600">Name</th>
-              <th className="py-4 px-6 text-sm font-semibold text-gray-600">Designation</th>
-              <th className="py-4 px-6 text-sm font-semibold text-gray-600">Image</th>
-              <th className="py-4 px-6 text-sm font-semibold text-gray-600 text-right">Actions</th>
+              <th className="py-4 px-6 text-sm font-semibold text-gray-600">
+                Name
+              </th>
+              <th className="py-4 px-6 text-sm font-semibold text-gray-600">
+                Designation
+              </th>
+              <th className="py-4 px-6 text-sm font-semibold text-gray-600">
+                Image
+              </th>
+              <th className="py-4 px-6 text-sm font-semibold text-gray-600 text-right">
+                Actions
+              </th>
             </tr>
           </thead>
           <tbody className="divide-y divide-gray-100">
             {members.map((member) => (
-              <tr key={member._id || member.id} className="hover:bg-gray-50/50 transition-colors">
-                <td className="py-4 px-6 font-medium text-gray-900">{member.fullName}</td>
-                <td className="py-4 px-6 text-gray-600">{member.designation}</td>
+              <tr
+                key={member._id || member.id}
+                className="hover:bg-gray-50/50 transition-colors"
+              >
+                <td className="py-4 px-6 font-medium text-gray-900">
+                  {member.fullName}
+                </td>
+                <td className="py-4 px-6 text-gray-600">
+                  {member.designation}
+                </td>
                 <td className="py-4 px-6">
                   <img
                     src={member.profileImageUrl}
                     alt={member.fullName}
                     className="w-12 h-12 rounded-xl object-cover bg-gray-100"
-                    onError={(e) => { e.target.src = "https://via.placeholder.com/150?text=No+Image"; }}
+                    onError={(e) => {
+                      e.target.src =
+                        "https://via.placeholder.com/150?text=No+Image";
+                    }}
                   />
                 </td>
                 <td className="py-4 px-6 text-right">
@@ -110,39 +130,56 @@ export default function BoardSection() {
       {showForm && (
         <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 p-4">
           <div className="bg-white rounded-3xl p-8 w-full max-w-md shadow-2xl">
-            <h3 className="text-xl font-bold mb-6 text-gray-800">Add Board Member</h3>
+            <h3 className="text-xl font-bold mb-6 text-gray-800">
+              Add Board Member
+            </h3>
             <form onSubmit={handleSubmit} className="space-y-4">
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Full Name</label>
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  Full Name
+                </label>
                 <input
                   type="text"
                   placeholder="e.g. Jane Doe"
                   value={formData.fullName}
-                  onChange={(e) => setFormData({ ...formData, fullName: e.target.value })}
-                  className="w-full border border-gray-200 rounded-xl px-4 py-3 focus:ring-2 focus:ring-teal-500 outline-none"
-                  required
-                />
-              </div>
-              
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Designation</label>
-                <input
-                  type="text"
-                  placeholder="e.g. Managing Director"
-                  value={formData.designation}
-                  onChange={(e) => setFormData({ ...formData, designation: e.target.value })}
+                  onChange={(e) =>
+                    setFormData({ ...formData, fullName: e.target.value })
+                  }
                   className="w-full border border-gray-200 rounded-xl px-4 py-3 focus:ring-2 focus:ring-teal-500 outline-none"
                   required
                 />
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Image URL</label>
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  Designation
+                </label>
+                <input
+                  type="text"
+                  placeholder="e.g. Managing Director"
+                  value={formData.designation}
+                  onChange={(e) =>
+                    setFormData({ ...formData, designation: e.target.value })
+                  }
+                  className="w-full border border-gray-200 rounded-xl px-4 py-3 focus:ring-2 focus:ring-teal-500 outline-none"
+                  required
+                />
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  Image URL
+                </label>
                 <input
                   type="text"
                   placeholder="https://example.com/photo.jpg"
                   value={formData.profileImageUrl}
-                  onChange={(e) => setFormData({ ...formData, profileImageUrl: e.target.value })}
+                  onChange={(e) =>
+                    setFormData({
+                      ...formData,
+                      profileImageUrl: e.target.value,
+                    })
+                  }
                   className="w-full border border-gray-200 rounded-xl px-4 py-3 focus:ring-2 focus:ring-teal-500 outline-none"
                   required
                 />

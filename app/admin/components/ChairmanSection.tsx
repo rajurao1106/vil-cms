@@ -31,13 +31,13 @@ export default function ChairmanSection() {
     try {
       // Note: Ensure this URL matches your backend route exactly
       const res = await fetch("http://localhost:1337/api/chairman-message");
-      
+
       if (!res.ok) {
         throw new Error(`Server responded with status: ${res.status}`);
       }
-      
+
       const json = await res.json();
-      
+
       // Handle Strapi's nested structure or flat JSON
       const attributes = json.data?.attributes || json.data || json;
 
@@ -45,9 +45,11 @@ export default function ChairmanSection() {
       setAuthorName(attributes?.authorName || "");
       setContent(attributes?.messageContent || "");
       setSignaturePath(attributes?.signatureImagePath || "");
-    } catch (err: any) {
+    } catch (err: unknown) {
       console.error("Error fetching chairman data:", err);
-      setError(err.message || "Failed to connect to the server.");
+      setError(
+        err instanceof Error ? err.message : "Failed to connect to the server.",
+      );
     } finally {
       setLoading(false);
     }
@@ -67,13 +69,16 @@ export default function ChairmanSection() {
     };
 
     try {
-      const res = await fetch("http://localhost:1337/api/chairman-message/save", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
+      const res = await fetch(
+        "http://localhost:1337/api/chairman-message/save",
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(payload),
         },
-        body: JSON.stringify(payload),
-      });
+      );
 
       if (res.ok) {
         alert("Chairman's Message Saved Successfully!");
@@ -99,9 +104,11 @@ export default function ChairmanSection() {
   if (error) {
     return (
       <div className="p-8 bg-red-50 rounded-3xl border border-red-100 max-w-3xl">
-        <h3 className="text-red-600 font-bold text-lg mb-2">Connection Error</h3>
+        <h3 className="text-red-600 font-bold text-lg mb-2">
+          Connection Error
+        </h3>
         <p className="text-red-500 mb-4">{error}</p>
-        <button 
+        <button
           onClick={fetchData}
           className="bg-red-600 text-white px-6 py-2 rounded-xl hover:bg-red-700 transition-colors"
         >
@@ -113,8 +120,10 @@ export default function ChairmanSection() {
 
   return (
     <div className="max-w-3xl animate-in fade-in duration-500">
-      <h2 className="text-3xl font-bold mb-8 text-gray-800">Chairman's Message</h2>
-      
+      <h2 className="text-3xl font-bold mb-8 text-gray-800">
+        Chairman's Message
+      </h2>
+
       <form
         onSubmit={handleSave}
         className="bg-white rounded-3xl p-8 shadow-sm border border-gray-100 space-y-6"

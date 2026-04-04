@@ -31,27 +31,22 @@ import statRoutes from './routes/statRoutes.js';
 import mapSettingRoutes from './routes/mapSettingRoutes.js';
 
 dotenv.config();
-
-// ✅ ENV Safety Check
-if (!process.env.MONGO_URI) {
-  console.error("❌ MONGO_URI is missing in .env");
-  process.exit(1);
-}
+connectDB();
 
 const app = express();
 
-// ✅ Fix __dirname in ES Modules
+// Fix __dirname in ES modules
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
-// ✅ Middleware
+// Middleware
 app.use(cors());
 app.use(express.json());
 
-// ✅ Static Folder (uploads)
+// Static folder
 app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 
-// ✅ Routes
+// Routes
 
 // Home & About
 app.use('/api/hero-sliders', heroRoutes);
@@ -59,7 +54,7 @@ app.use('/api/company', companyRoutes);
 app.use('/api/vision-mission', visionRoutes);
 app.use('/api/chairman-message', chairmanRoutes);
 
-// Team & Governance
+// Team
 app.use('/api/board-members', boardRoutes);
 app.use('/api/committees', committeeRoutes);
 app.use('/api/programmes', programmeRoutes);
@@ -76,47 +71,26 @@ app.use('/api/footer-links', footerRoutes);
 // Contact & Location
 app.use('/api/contact-info', contactRoutes);
 app.use('/api/addresses', addressRoutes);
-app.use('/api/map', mapRoutes); // renamed for clarity
-app.use('/api/map-settings', mapSettingRoutes);
+app.use('/api/map-location', mapRoutes);
 app.use('/api/contact-page-settings', contactPageRoutes);
+app.use('/api/map-settings', mapSettingRoutes);
 
-// Careers & Documents
+// Careers & Docs
 app.use('/api/jobs', jobRoutes);
 app.use('/api/documents', documentRoutes);
 
-// Other Sections
+// Misc
 app.use('/api/about-snippet', aboutSnippetRoutes);
 app.use('/api/stats', statRoutes);
 
-// ✅ Health Check Routes
+// Test route
 app.get("/", (req, res) => {
   res.send("API running...");
 });
 
-app.get("/test", (req, res) => {
-  res.send("Server working ✅");
+// Start server
+const PORT = process.env.PORT || 1337;
+
+app.listen(PORT, () => {
+  console.log(`🚀 Server running on port ${PORT}`);
 });
-
-// ✅ Start Server (with DB connection)
-const PORT = process.env.PORT || 1337; 
-
-async function startServer() {
-  try {
-    await connectDB();
-    console.log("✅ MongoDB Connected");
-
-    // 👉 If NOT serverless → start server
-    if (process.env.NODE_ENV !== "production") {
-      app.listen(PORT, () => {
-        console.log(`🚀 Server running on port ${PORT}`);
-      });
-    }
-  } catch (error) {
-    console.error("❌ Failed to start server:", error);
-    process.exit(1);
-  }
-}
-
-startServer();
-
-export default app;

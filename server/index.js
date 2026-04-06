@@ -41,9 +41,13 @@ const __dirname = path.dirname(__filename);
 // Middleware
 // Middleware
 app.use(cors({
-  origin: ["http://localhost:3000", "https://vil-cms.vercel.app"], // Add your Next.js URL
-  credentials: true, // This allows cookies to be sent back and forth
-  methods: ["GET", "POST", "PUT", "DELETE"],
+  // Yahan Frontend ka URL hona chahiye, Backend ka nahi!
+  origin: [
+    "http://localhost:3000", 
+    "https://vil-cms.vercel.app" // Aapka actual frontend domain
+  ], 
+  credentials: true,
+  methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
   allowedHeaders: ["Content-Type", "Authorization"]
 }));
 app.use(express.json());

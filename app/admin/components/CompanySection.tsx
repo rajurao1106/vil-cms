@@ -46,7 +46,7 @@ export default function CompanySection() {
       
       setData(json || {});
       setContent(json?.mainContent || "");
-    } catch (error: any) {
+    } catch (error: unknown) {
       // 404 means section is new, just clear state
       setData({});
       setContent("");

@@ -2,6 +2,7 @@
 import React, { useState, useEffect, useCallback } from "react";
 import api from "@/lib/api"; // Aapka Axios instance
 import { toast } from "react-toastify";
+import axios from "axios"; // Added for type guarding
 
 interface Post {
   _id: string;
@@ -42,7 +43,7 @@ export default function PostsSection() {
       const res = await api.get("/posts");
       const data = res.data;
       setPosts(Array.isArray(data) ? data : data.data || []);
-    } catch (err) {
+    } catch (err: unknown) {
       console.error("Error fetching posts:", err);
       setPosts([]);
     } finally {
@@ -100,9 +101,18 @@ export default function PostsSection() {
         tags: "",
       });
       fetchPosts();
-    } catch (err: any) {
+    } catch (err: unknown) {
       console.error("Save error:", err);
-      toast.error(err.response?.data?.message || "Error saving post");
+      
+      // Fix: Type-safe error message extraction
+      let errorMessage = "Error saving post";
+      if (axios.isAxiosError(err)) {
+        errorMessage = err.response?.data?.message || err.message;
+      } else if (err instanceof Error) {
+        errorMessage = err.message;
+      }
+      
+      toast.error(errorMessage);
     } finally {
       setIsSubmitting(false);
     }

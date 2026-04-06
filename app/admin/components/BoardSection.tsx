@@ -5,6 +5,7 @@ import dynamic from "next/dynamic";
 import "react-quill-new/dist/quill.snow.css";
 import api from "@/lib/api"; // Aapka Axios Client
 import { toast } from "react-toastify";
+import axios from "axios";
 
 const ReactQuill = dynamic(() => import("react-quill-new"), {
   ssr: false,
@@ -29,18 +30,24 @@ export default function ChairmanSection() {
     setLoading(true);
     setError(null);
     try {
-      // Fetch ki jagah api.get use karein
       const res = await api.get("/chairman-message");
       const json = res.data;
 
+      // Handling different possible Strapi/API response structures
       const attributes = json.data?.attributes || json.data || json;
 
       setAuthorName(attributes?.authorName || "");
       setContent(attributes?.messageContent || "");
       setSignaturePath(attributes?.signatureImagePath || "");
-    } catch (err: any) {
+    } catch (err: unknown) {
       console.error("Error fetching chairman data:", err);
-      setError(err.message || "Failed to connect to the server.");
+      
+      // Fix: Check if err is an instance of Error to access .message
+      if (err instanceof Error) {
+        setError(err.message);
+      } else {
+        setError("Failed to connect to the server.");
+      }
     } finally {
       setLoading(false);
     }
@@ -61,13 +68,17 @@ export default function ChairmanSection() {
     };
 
     try {
-      // api.post use karein, headers aur stringify ki zaroorat nahi
       await api.post("/chairman-message/save", payload);
       toast.success("Chairman's Message Saved Successfully!");
-    } catch (error: any) {
-      console.error("Save error:", error);
-      // Interceptor error toast handle kar lega, par fallback ke liye alert ya toast:
-      toast.error(error.response?.data?.message || "Failed to save message.");
+    } catch (err: unknown) {
+      console.error("Save error:", err);
+      
+      // Fix: Robust error handling for Axios
+      if (axios.isAxiosError(err)) {
+        toast.error(err.response?.data?.message || "Failed to save message.");
+      } else {
+        toast.error("An unexpected error occurred.");
+      }
     } finally {
       setIsSaving(false);
     }
@@ -99,7 +110,7 @@ export default function ChairmanSection() {
 
   return (
     <div className="max-w-3xl animate-in fade-in duration-500">
-      <h2 className="text-3xl font-bold mb-8 text-gray-800">Chairman's Message</h2>
+      <h2 className="text-3xl font-bold mb-8 text-gray-800">Chairmans Message</h2>
 
       <form
         onSubmit={handleSave}

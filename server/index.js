@@ -9,7 +9,7 @@ import cookieParser from 'cookie-parser';
 import connectDB from './config/db.js';
 
 // Route Imports
-import aboutSnippetRoutes from './routes/aboutSnippetRoutes.js';
+
 dotenv.config();
 connectDB();
 
@@ -31,7 +31,7 @@ app.use(cookieParser());
 
 // Static Folders for Uploads (Images/PDFs)
 
-app.use('/api/about-snippet', aboutSnippetRoutes);
+
 
 
 // ... existing code ...

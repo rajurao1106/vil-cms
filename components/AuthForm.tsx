@@ -20,7 +20,7 @@ export default function AuthForm({ type }: AuthFormProps) {
     const endpoint = type === "login" ? "/api/auth/login" : "/api/auth/register";
 
     try {
-      const res = await fetch(`http://localhost:1337${endpoint}`, {
+      const res = await fetch(`https://vil-cms-dhct.vercel.app${endpoint}`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(formData),

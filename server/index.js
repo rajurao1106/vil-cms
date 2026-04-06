@@ -3,6 +3,7 @@ import dotenv from 'dotenv';
 import cors from 'cors';
 import path from 'path';
 import { fileURLToPath } from 'url';
+import cookieParser from 'cookie-parser';
 
 // Database Connection
 import connectDB from './config/db.js';
@@ -29,6 +30,7 @@ import documentRoutes from './routes/documentRoutes.js';
 import aboutSnippetRoutes from './routes/aboutSnippetRoutes.js';
 import statRoutes from './routes/statRoutes.js';
 import mapSettingRoutes from './routes/mapSettingRoutes.js';
+import authRoutes from "./routes/authRoutes.js"
 dotenv.config();
 connectDB();
 
@@ -37,8 +39,17 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
 // Middleware
-app.use(cors());
+// Middleware
+app.use(cors({
+  origin: ["http://localhost:3000", "https://your-frontend-domain.com"], // Add your Next.js URL
+  credentials: true, // This allows cookies to be sent back and forth
+  methods: ["GET", "POST", "PUT", "DELETE"],
+  allowedHeaders: ["Content-Type", "Authorization"]
+}));
 app.use(express.json());
+
+
+app.use(cookieParser());
 
 // Static Folders for Uploads (Images/PDFs)
 app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
@@ -74,7 +85,7 @@ app.use('/api/jobs', jobRoutes);
 app.use('/api/documents', documentRoutes);
 
 app.use('/api/about-snippet', aboutSnippetRoutes);
-
+app.use('/api/auth', authRoutes);
 
 // ... existing code ...
 

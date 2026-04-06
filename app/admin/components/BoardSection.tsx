@@ -1,164 +1,157 @@
 "use client";
-import React, { useState, useEffect } from "react";
 
-interface Member {
-  _id: string;
-  fullName: string;
-  designation: string;
-  profileImageUrl: string;
-}
+import React, { useState, useEffect, useCallback } from "react";
+import dynamic from "next/dynamic";
+import "react-quill-new/dist/quill.snow.css";
+import api from "@/lib/api"; // Aapka Axios Client
+import { toast } from "react-toastify";
 
-export default function BoardSection() {
-  const [members, setMembers] = useState<Member[]>([]);
-  const [showForm, setShowForm] = useState(false);
-  const [formData, setFormData] = useState({
-    fullName: "",
-    designation: "",
-    profileImageUrl: "",
-  });
+const ReactQuill = dynamic(() => import("react-quill-new"), {
+  ssr: false,
+  loading: () => (
+    <div className="h-80 w-full bg-gray-100 animate-pulse rounded-2xl flex items-center justify-center text-gray-400">
+      Loading Editor...
+    </div>
+  ),
+});
 
-  useEffect(() => {
-    fetchMembers();
+export default function ChairmanSection() {
+  const [loading, setLoading] = useState(true);
+  const [isSaving, setIsSaving] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+
+  // Form States
+  const [content, setContent] = useState("");
+  const [authorName, setAuthorName] = useState("");
+  const [signaturePath, setSignaturePath] = useState("");
+
+  const fetchData = useCallback(async () => {
+    setLoading(true);
+    setError(null);
+    try {
+      // Fetch ki jagah api.get use karein
+      const res = await api.get("/chairman-message");
+      const json = res.data;
+
+      const attributes = json.data?.attributes || json.data || json;
+
+      setAuthorName(attributes?.authorName || "");
+      setContent(attributes?.messageContent || "");
+      setSignaturePath(attributes?.signatureImagePath || "");
+    } catch (err: any) {
+      console.error("Error fetching chairman data:", err);
+      setError(err.message || "Failed to connect to the server.");
+    } finally {
+      setLoading(false);
+    }
   }, []);
 
-  const fetchMembers = async () => {
+  useEffect(() => {
+    fetchData();
+  }, [fetchData]);
+
+  const handleSave = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setIsSaving(true);
+
+    const payload = {
+      authorName: authorName,
+      messageContent: content,
+      signatureImagePath: signaturePath,
+    };
+
     try {
-      const res = await fetch("https://vil-cms.vercel.app/api/board-members");
-      const data = await res.json();
-      setMembers(data);
-    } catch (error) {
-      console.error("Error fetching members:", error);
+      // api.post use karein, headers aur stringify ki zaroorat nahi
+      await api.post("/chairman-message/save", payload);
+      toast.success("Chairman's Message Saved Successfully!");
+    } catch (error: any) {
+      console.error("Save error:", error);
+      // Interceptor error toast handle kar lega, par fallback ke liye alert ya toast:
+      toast.error(error.response?.data?.message || "Failed to save message.");
+    } finally {
+      setIsSaving(false);
     }
   };
 
-  const handleSubmit = async (e: { preventDefault: () => void }) => {
-    e.preventDefault();
+  if (loading) {
+    return (
+      <div className="p-8 flex flex-col items-center justify-center min-h-[400px]">
+        <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-teal-500 mb-4"></div>
+        <p className="text-gray-500 font-medium">Loading Chairman Data...</p>
+      </div>
+    );
+  }
 
-    // Changed from FormData to JSON
-    await fetch("https://vil-cms.vercel.app/api/board-members/add", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify(formData),
-    });
-
-    setShowForm(false);
-    setFormData({ fullName: "", designation: "", profileImageUrl: "" });
-    fetchMembers();
-  };
-
-  const deleteMember = async (id: string) => {
-    if (!confirm("Delete member?")) return;
-    await fetch(`https://vil-cms.vercel.app/api/board-members/${id}`, {
-      method: "DELETE",
-    });
-    fetchMembers();
-  };
-
-  return (
-    <div>
-      <div className="flex justify-between mb-8">
-        <h2 className="text-3xl font-bold">Board of Directors</h2>
+  if (error) {
+    return (
+      <div className="p-8 bg-red-50 rounded-3xl border border-red-100 max-w-3xl">
+        <h3 className="text-red-600 font-bold text-lg mb-2">Connection Error</h3>
+        <p className="text-red-500 mb-4">{error}</p>
         <button
-          onClick={() => setShowForm(true)}
-          className="bg-teal-600 text-white px-6 py-3 rounded-2xl"
+          onClick={fetchData}
+          className="bg-red-600 text-white px-6 py-2 rounded-xl hover:bg-red-700 transition-colors"
         >
-          Add Member
+          Try Again
         </button>
       </div>
+    );
+  }
 
-      <div className="bg-white rounded-3xl overflow-hidden shadow">
-        <table className="w-full">
-          <thead className="bg-gray-50">
-            <tr>
-              <th className="py-4 px-6 text-left">Name</th>
-              <th className="py-4 px-6 text-left">Designation</th>
-              <th className="py-4 px-6 text-left">Image</th>
-              <th className="py-4 px-6 text-left">Actions</th>
-            </tr>
-          </thead>
-          <tbody>
-            {members.map((member) => (
-              <tr key={member._id} className="border-t">
-                <td className="py-4 px-6 font-medium">{member.fullName}</td>
-                <td className="py-4 px-6">{member.designation}</td>
-                <td className="py-4 px-6">
-                  <img
-                    src={member.profileImageUrl}
-                    alt={member.fullName}
-                    className="w-12 h-12 rounded-2xl object-cover"
-                  />
-                </td>
-                <td className="py-4 px-6">
-                  <button
-                    onClick={() => deleteMember(member._id)}
-                    className="text-red-600 hover:underline"
-                  >
-                    Delete
-                  </button>
-                </td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
-      </div>
+  return (
+    <div className="max-w-3xl animate-in fade-in duration-500">
+      <h2 className="text-3xl font-bold mb-8 text-gray-800">Chairman's Message</h2>
 
-      {showForm && (
-        <div className="fixed inset-0 bg-black/60 flex items-center justify-center z-50">
-          <div className="bg-white rounded-3xl p-8 w-full max-w-md">
-            <h3 className="text-xl font-bold mb-6">Add Board Member</h3>
-            <form onSubmit={handleSubmit} className="space-y-4">
-              <input
-                type="text"
-                placeholder="Full Name"
-                value={formData.fullName}
-                onChange={(e) =>
-                  setFormData({ ...formData, fullName: e.target.value })
-                }
-                className="w-full border rounded-2xl px-4 py-3"
-                required
-              />
-              <input
-                type="text"
-                placeholder="Designation"
-                value={formData.designation}
-                onChange={(e) =>
-                  setFormData({ ...formData, designation: e.target.value })
-                }
-                className="w-full border rounded-2xl px-4 py-3"
-                required
-              />
-              {/* Changed from type="file" to type="text" */}
-              <input
-                type="text"
-                placeholder="Profile Image URL"
-                value={formData.profileImageUrl}
-                onChange={(e) =>
-                  setFormData({ ...formData, profileImageUrl: e.target.value })
-                }
-                className="w-full border rounded-2xl px-4 py-3"
-                required
-              />
-              <div className="flex gap-4 mt-6">
-                <button
-                  type="button"
-                  onClick={() => setShowForm(false)}
-                  className="flex-1 py-4 border rounded-3xl"
-                >
-                  Cancel
-                </button>
-                <button
-                  type="submit"
-                  className="flex-1 py-4 bg-teal-600 text-white rounded-3xl"
-                >
-                  Add Member
-                </button>
-              </div>
-            </form>
+      <form
+        onSubmit={handleSave}
+        className="bg-white rounded-3xl p-8 shadow-sm border border-gray-100 space-y-6"
+      >
+        {/* Author Name */}
+        <div>
+          <label className="block text-sm font-semibold mb-2 text-gray-700">Author Name</label>
+          <input
+            type="text"
+            value={authorName}
+            onChange={(e) => setAuthorName(e.target.value)}
+            placeholder="e.g. Dr. John Doe"
+            className="w-full border border-gray-200 rounded-2xl px-4 py-3 focus:outline-none focus:ring-2 focus:ring-teal-500 transition-all"
+            required
+          />
+        </div>
+
+        {/* Message Content (Rich Text) */}
+        <div>
+          <label className="block text-sm font-semibold mb-2 text-gray-700">Message Content</label>
+          <div className="min-h-[350px] pb-12">
+            <ReactQuill
+              theme="snow"
+              value={content}
+              onChange={setContent}
+              className="h-72"
+            />
           </div>
         </div>
-      )}
+
+        {/* Signature Path */}
+        <div>
+          <label className="block text-sm font-semibold mb-2 text-gray-700">Signature Image URL / Path</label>
+          <input
+            type="text"
+            value={signaturePath}
+            onChange={(e) => setSignaturePath(e.target.value)}
+            placeholder="/images/signatures/chairman.png"
+            className="w-full border border-gray-200 rounded-2xl px-4 py-3 focus:outline-none focus:ring-2 focus:ring-teal-500 transition-all"
+          />
+        </div>
+
+        <button
+          type="submit"
+          disabled={isSaving}
+          className={`w-full font-bold py-4 rounded-3xl transition-all duration-200 shadow-lg 
+            ${isSaving ? "bg-gray-400 cursor-not-allowed" : "bg-teal-600 hover:bg-teal-700 text-white shadow-teal-100 active:scale-[0.98]"}`}
+        >
+          {isSaving ? "Saving..." : "Save Message"}
+        </button>
+      </form>
     </div>
   );
 }

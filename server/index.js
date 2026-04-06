@@ -41,7 +41,7 @@ const __dirname = path.dirname(__filename);
 // Middleware
 // Middleware
 app.use(cors({
-  origin: ["http://localhost:3000", "https://vil-cms-dhct.vercel.app"], // Add your Next.js URL
+  origin: ["http://localhost:3000", "https://vil-cms.vercel.app"], // Add your Next.js URL
   credentials: true, // This allows cookies to be sent back and forth
   methods: ["GET", "POST", "PUT", "DELETE"],
   allowedHeaders: ["Content-Type", "Authorization"]

@@ -18,7 +18,7 @@ interface SliderFormData {
   subtitle?: string;
   ctaText?: string;
   ctaLink?: string;
-  backgroundImagePath?: File | null;
+  backgroundImagePath?: string; // Change from File to string
 }
 
 export default function HeroSection() {
@@ -48,23 +48,14 @@ export default function HeroSection() {
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    const fd = new FormData();
-    
-    // Fixed: Type-safe way to append to FormData
-    (Object.keys(formData) as Array<keyof SliderFormData>).forEach((key) => {
-      const value = formData[key];
-      if (value !== undefined && value !== null) {
-        // FormData.append handles both strings and Files/Blobs
-        fd.append(key, value as string | Blob);
-      }
-    });
 
     try {
+      // Ab hum seedha JSON bhej sakte hain kyunki image URL string hai
       if (editing) {
-        await axiosClient.put(`/hero-sliders/${editing._id}`, fd);
+        await axiosClient.put(`/hero-sliders/${editing._id}`, formData);
         toast.success("Slider updated successfully");
       } else {
-        await axiosClient.post("/hero-sliders/add", fd);
+        await axiosClient.post("/hero-sliders/add", formData);
         toast.success("Slider added successfully");
       }
       
@@ -134,7 +125,7 @@ export default function HeroSection() {
                         subtitle: slider.subtitle,
                         ctaText: slider.ctaText,
                         ctaLink: slider.ctaLink,
-                        backgroundImagePath: null, // Reset file input on edit
+                        backgroundImagePath: slider.backgroundImagePath,
                       });
                       setShowForm(true);
                     }}
@@ -194,13 +185,16 @@ export default function HeroSection() {
                 />
               </div>
               
-              <div className="bg-gray-50 p-4 rounded-2xl border border-dashed border-gray-300">
-                <label className="block text-sm font-medium text-gray-600 mb-2">Background Image</label>
+              {/* Updated: Text input for CDN Link */}
+              <div className="space-y-2">
+                <label className="block text-sm font-medium text-gray-600">Background Image URL (CDN)</label>
                 <input
-                  type="file"
-                  accept="image/*"
-                  onChange={(e) => setFormData({ ...formData, backgroundImagePath: e.target.files?.[0] || null })}
-                  className="w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-teal-50 file:text-teal-700 hover:file:bg-teal-100"
+                  type="text"
+                  placeholder="https://example.com/image.jpg"
+                  value={formData.backgroundImagePath || ""}
+                  onChange={(e) => setFormData({ ...formData, backgroundImagePath: e.target.value })}
+                  className="w-full border border-gray-200 rounded-2xl px-4 py-3 focus:ring-2 focus:ring-teal-500 outline-none"
+                  required
                 />
               </div>
 

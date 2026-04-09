@@ -42,9 +42,16 @@ const __dirname = path.dirname(__filename);
 // Middleware
 app.use(
   cors({
-    origin: "*", // Allows all origins - use ONLY for temporary debugging
+    // Yahan Frontend ka URL hona chahiye, Backend ka nahi!
+    origin: [
+      "http://localhost:3000",
+      "https://vil-cms.vercel.app",
+      "http://localhost:3001", // Aapka actual frontend domain
+    ],
     credentials: true,
-  })
+    methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
+    allowedHeaders: ["Content-Type", "Authorization"],
+  }),
 );
 app.use(express.json());
 app.use(cookieParser());

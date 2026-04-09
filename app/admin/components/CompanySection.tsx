@@ -12,17 +12,13 @@ const ReactQuill = dynamic(() => import("react-quill-new"), {
 
 const categories = [
   "The Company",
-  // "Vision & Mission",
-  // "Chairman Message",
-  // "Board of Directors",
-  // "Committees",
-  // "Familiarization",
 ];
 
 interface CompanyData {
   pageTitle?: string;
   subtitle?: string;
   mainContent?: string;
+  imageUrl?: string; // Naya field URL ke liye
 }
 
 export default function CompanySection() {
@@ -36,18 +32,16 @@ export default function CompanySection() {
     fetchSection();
   }, [selectedCategory]);
 
-  // --- FETCH DATA (Using Axios) ---
+  // --- FETCH DATA ---
   const fetchSection = async () => {
     try {
       setLoading(true);
-      // Axios params automatically encode ho jate hain
       const res = await api.get(`/company/${selectedCategory}`);
       const json = res.data;
       
       setData(json || {});
       setContent(json?.mainContent || "");
     } catch (error: any) {
-      // 404 means section is new, just clear state
       setData({});
       setContent("");
       console.log("Section is empty or new.");
@@ -56,38 +50,32 @@ export default function CompanySection() {
     }
   };
 
-  // --- SAVE DATA (Using Axios & FormData) ---
- const handleSave = async (e: React.FormEvent<HTMLFormElement>) => {
+  // --- SAVE DATA ---
+  const handleSave = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     setIsSaving(true);
 
     const formElement = e.currentTarget;
-    const fd = new FormData();
-
-    // Explicitly append fields to ensure they exist
+    
+    // Form se values nikaalna
     const pageTitle = (formElement.elements.namedItem("pageTitle") as HTMLInputElement).value;
     const subtitle = (formElement.elements.namedItem("subtitle") as HTMLInputElement).value;
-    const fileInput = formElement.elements.namedItem("sectionImage") as HTMLInputElement;
+    const imageUrl = (formElement.elements.namedItem("imageUrl") as HTMLInputElement).value;
 
-    fd.append("category", selectedCategory);
-    fd.append("pageTitle", pageTitle || "");
-    fd.append("subtitle", subtitle || "");
-    fd.append("mainContent", content); // Rich text state
-
-    // Only append image if a file was actually selected
-    if (fileInput?.files?.[0]) {
-      fd.append("sectionImage", fileInput.files[0]);
-    }
+    // Payload taiyar karna (Ab simple JSON bhej rahe hain)
+    const payload = {
+      category: selectedCategory,
+      pageTitle: pageTitle || "",
+      subtitle: subtitle || "",
+      mainContent: content,
+      imageUrl: imageUrl || "", // File ki jagah Text URL
+    };
 
     try {
-      await api.post("/company/save", fd, {
-        headers: {
-          "Content-Type": "multipart/form-data",
-        },
-      });
+      // Multipart ki zaroorat nahi agar sirf text bhej rahe hain
+      await api.post("/company/save", payload);
       toast.success(`${selectedCategory} Saved Successfully!`);
     } catch (err: any) {
-      // Check if backend sent a specific error message
       const errorMsg = err.response?.data?.message || "Failed to save data.";
       console.error("Save error details:", err.response?.data);
       toast.error(errorMsg);
@@ -154,13 +142,18 @@ export default function CompanySection() {
               </div>
             </div>
 
-            <div className="bg-gray-50 p-6 rounded-2xl border border-dashed border-gray-300">
-              <label className="block text-sm font-semibold text-gray-700 mb-2">Section Image (Optional)</label>
+            {/* --- FILE INPUT REMOVED, TEXT INPUT ADDED --- */}
+            <div>
+              <label className="block text-sm font-semibold text-gray-700 mb-2">Section Image URL</label>
               <input
-                type="file"
-                name="sectionImage"
-                className="w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-teal-50 file:text-teal-700 hover:file:bg-teal-100"
+                name="imageUrl"
+                type="text"
+                key={`${selectedCategory}-image`}
+                defaultValue={data.imageUrl || ""}
+                placeholder="https://example.com/image.jpg"
+                className="w-full border border-gray-200 rounded-2xl px-4 py-3 focus:ring-2 focus:ring-teal-500 outline-none transition-all"
               />
+              <p className="mt-1 text-xs text-gray-400 ml-1">Paste the direct link to the image.</p>
             </div>
 
             <button

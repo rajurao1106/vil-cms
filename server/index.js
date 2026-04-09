@@ -47,6 +47,7 @@ app.use(
       "http://localhost:3000",
       "https://vil-cms.vercel.app",
       "http://localhost:3001", // Aapka actual frontend domain
+      "https://vaswani-industrials.vercel.app"
     ],
     credentials: true,
     methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],

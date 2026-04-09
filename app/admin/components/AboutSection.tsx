@@ -28,29 +28,31 @@ export default function AboutSection() {
   const [loading, setLoading] = useState(false);
 
   // --- Fetch Data ---
-  const fetchData = async () => {
-    try {
-      setLoading(true);
-      const res = await fetch(API_URL, {
-        method: "GET",
-        cache: "no-store",
-      });
+const fetchData = async () => {
+  try {
+    setLoading(true);
+    const res = await fetch(API_URL, {
+      method: "GET",
+      cache: "no-store",
+    });
 
-      if (!res.ok) throw new Error("Failed to fetch data");
+    if (!res.ok) throw new Error("Failed to fetch data");
 
-      const json = await res.data || await res.json();
-      // Handle potential nesting (common in CMS responses)
-      const attributes = json.data || json;
-      
-      setData(attributes || {});
-      setContent(attributes?.content || "");
-    } catch (err) {
-      console.error("Fetch error:", err);
-      toast.error("Could not load about section data.");
-    } finally {
-      setLoading(false);
-    }
-  };
+    // Standard Fetch approach
+    const json = await res.json();
+    
+    // Extract attributes: uses json.data if it exists, otherwise the whole object
+    const attributes = json.data || json;
+    
+    setData(attributes || {});
+    setContent(attributes?.content || "");
+  } catch (err) {
+    console.error("Fetch error:", err);
+    toast.error("Could not load about section data.");
+  } finally {
+    setLoading(false);
+  }
+};
 
   useEffect(() => {
     fetchData();

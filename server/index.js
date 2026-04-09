@@ -56,7 +56,45 @@ app.use(
 app.use(express.json());
 app.use(cookieParser());
 
+// Static Folders for Uploads (Images/PDFs)
+app.use("/uploads", express.static(path.join(__dirname, "uploads")));
 
+// Home & About Sections
+app.use("/api/hero-sliders", heroRoutes);
+app.use("/api/company", companyRoutes);
+app.use("/api/vision-mission", visionRoutes);
+app.use("/api/chairman-message", chairmanRoutes);
+
+// Team & Governance
+app.use("/api/board-members", boardRoutes);
+app.use("/api/committees", committeeRoutes);
+app.use("/api/programmes", programmeRoutes);
+
+// Products & Content
+app.use("/api/products", productRoutes);
+app.use("/api/posts", postRoutes);
+app.use("/api/media", mediaRoutes);
+app.use("/api/reviews", reviewRoutes);
+
+// Footer & Global Links
+app.use("/api/footer-links", footerRoutes);
+
+// Contact Page & Location
+app.use("/api/contact-info", contactRoutes);
+app.use("/api/addresses", addressRoutes);
+app.use("/api/map-location", mapRoutes);
+app.use("/api/contact-page-settings", contactPageRoutes); // FAQ & Map Embed
+app.use("/api/map-settings", mapSettingRoutes); // New Map Settings Route
+// Careers & Investor Relations
+app.use("/api/jobs", jobRoutes);
+app.use("/api/documents", documentRoutes);
+
+app.use("/api/about-snippet", aboutSnippetRoutes);
+app.use("/api/auth", authRoutes);
+
+// ... existing code ...
+
+app.use("/api/stats", statRoutes);
 
 app.get("/", (req, res) => {
   res.send("API running...");

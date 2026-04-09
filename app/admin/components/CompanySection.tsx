@@ -2,7 +2,7 @@
 import React, { useState, useEffect } from "react";
 import dynamic from "next/dynamic";
 import "react-quill-new/dist/quill.snow.css";
-import api from "@/lib/api"; // Aapka Axios instance
+import api from "@/lib/api"; 
 import { toast } from "react-toastify";
 
 const ReactQuill = dynamic(() => import("react-quill-new"), {
@@ -10,74 +10,82 @@ const ReactQuill = dynamic(() => import("react-quill-new"), {
   loading: () => <div className="h-80 bg-gray-50 animate-pulse rounded-2xl" />,
 });
 
+// Categories must match the Mongoose Enum exactly
 const categories = [
   "The Company",
+  "Vision & Mission",
+  "Chairman Message",
+  "Board of Directors",
+  "Committees",
+  "Familiarization"
 ];
 
 interface CompanyData {
-  pageTitle?: string;
-  subtitle?: string;
-  mainContent?: string;
-  imageUrl?: string; // Naya field URL ke liye
+  pageTitle: string;
+  subtitle: string;
+  mainContent: string;
+  sectionImage: string; // Updated to match Schema
 }
 
 export default function CompanySection() {
   const [selectedCategory, setSelectedCategory] = useState(categories[0]);
-  const [data, setData] = useState<CompanyData>({});
-  const [content, setContent] = useState("");
   const [loading, setLoading] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
+
+  // Form State
+  const [formData, setFormData] = useState<CompanyData>({
+    pageTitle: "",
+    subtitle: "",
+    mainContent: "",
+    sectionImage: "",
+  });
 
   useEffect(() => {
     fetchSection();
   }, [selectedCategory]);
 
-  // --- FETCH DATA ---
   const fetchSection = async () => {
     try {
       setLoading(true);
       const res = await api.get(`/company/${selectedCategory}`);
       const json = res.data;
       
-      setData(json || {});
-      setContent(json?.mainContent || "");
+      if (json) {
+        setFormData({
+          pageTitle: json.pageTitle || "",
+          subtitle: json.subtitle || "",
+          mainContent: json.mainContent || "",
+          sectionImage: json.sectionImage || "", // Map from DB sectionImage
+        });
+      } else {
+        resetForm();
+      }
     } catch (error: any) {
-      setData({});
-      setContent("");
+      resetForm();
       console.log("Section is empty or new.");
     } finally {
       setLoading(false);
     }
   };
 
-  // --- SAVE DATA ---
-  const handleSave = async (e: React.FormEvent<HTMLFormElement>) => {
+  const resetForm = () => {
+    setFormData({ pageTitle: "", subtitle: "", mainContent: "", sectionImage: "" });
+  };
+
+  const handleSave = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsSaving(true);
 
-    const formElement = e.currentTarget;
-    
-    // Form se values nikaalna
-    const pageTitle = (formElement.elements.namedItem("pageTitle") as HTMLInputElement).value;
-    const subtitle = (formElement.elements.namedItem("subtitle") as HTMLInputElement).value;
-    const imageUrl = (formElement.elements.namedItem("imageUrl") as HTMLInputElement).value;
-
-    // Payload taiyar karna (Ab simple JSON bhej rahe hain)
     const payload = {
       category: selectedCategory,
-      pageTitle: pageTitle || "",
-      subtitle: subtitle || "",
-      mainContent: content,
-      imageUrl: imageUrl || "", // File ki jagah Text URL
+      ...formData
     };
 
     try {
-      // Multipart ki zaroorat nahi agar sirf text bhej rahe hain
       await api.post("/company/save", payload);
       toast.success(`${selectedCategory} Saved Successfully!`);
     } catch (err: any) {
       const errorMsg = err.response?.data?.message || "Failed to save data.";
-      console.error("Save error details:", err.response?.data);
       toast.error(errorMsg);
     } finally {
       setIsSaving(false);
@@ -111,20 +119,19 @@ export default function CompanySection() {
             <div>
               <label className="block text-sm font-semibold text-gray-700 mb-2">Page Title</label>
               <input
-                name="pageTitle"
-                key={`${selectedCategory}-title`}
-                defaultValue={data.pageTitle || ""}
+                value={formData.pageTitle}
+                onChange={(e) => setFormData({...formData, pageTitle: e.target.value})}
                 placeholder="Enter title..."
                 className="w-full border border-gray-200 rounded-2xl px-4 py-3 focus:ring-2 focus:ring-teal-500 outline-none transition-all"
+                required
               />
             </div>
 
             <div>
               <label className="block text-sm font-semibold text-gray-700 mb-2">Subtitle</label>
               <input
-                name="subtitle"
-                key={`${selectedCategory}-subtitle`}
-                defaultValue={data.subtitle || ""}
+                value={formData.subtitle}
+                onChange={(e) => setFormData({...formData, subtitle: e.target.value})}
                 placeholder="Enter subtitle..."
                 className="w-full border border-gray-200 rounded-2xl px-4 py-3 focus:ring-2 focus:ring-teal-500 outline-none transition-all"
               />
@@ -135,21 +142,19 @@ export default function CompanySection() {
               <div className="min-h-[350px] pb-12">
                 <ReactQuill
                   theme="snow"
-                  value={content}
-                  onChange={setContent}
+                  value={formData.mainContent}
+                  onChange={(val) => setFormData({...formData, mainContent: val})}
                   className="h-72"
                 />
               </div>
             </div>
 
-            {/* --- FILE INPUT REMOVED, TEXT INPUT ADDED --- */}
             <div>
               <label className="block text-sm font-semibold text-gray-700 mb-2">Section Image URL</label>
               <input
-                name="imageUrl"
                 type="text"
-                key={`${selectedCategory}-image`}
-                defaultValue={data.imageUrl || ""}
+                value={formData.sectionImage}
+                onChange={(e) => setFormData({...formData, sectionImage: e.target.value})}
                 placeholder="https://example.com/image.jpg"
                 className="w-full border border-gray-200 rounded-2xl px-4 py-3 focus:ring-2 focus:ring-teal-500 outline-none transition-all"
               />

@@ -113,7 +113,7 @@ export default function ProductsSection() {
               <option value="Published">Published</option>
               <option value="Draft">Draft</option>
             </select>
-          </div>
+          </div> 
           <textarea name="shortDescription" placeholder="Description" className="w-full p-4 border rounded-xl" value={formData.shortDescription} onChange={handleChange} />
           
           <div className="p-4 bg-gray-50 rounded-xl">
